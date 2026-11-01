@@ -1,0 +1,38 @@
+[workspace]
+resolver = "2"
+members = [
+  "contracts/factory-interface",
+  "contracts/factory",
+  "contracts/pair",
+  "contracts/router",
+  "contracts/library",
+  "contracts/token",
+]
+
+[workspace.package]
+edition = "2021"
+license = "Apache-2.0"
+repository = "https://github.com/VELTRIXAE/Contract"
+rust-version = "1.84"
+
+[workspace.dependencies]
+soroban-sdk = "22.0.11"
+soroban-token-sdk = "22.0.11"
+num-integer = { version = "0.1.46", default-features = false, features = ["i128"] }
+
+# One release profile for every contract. `overflow-checks = true` makes any
+# unchecked arithmetic that slips through abort instead of wrapping. Upstream
+# enabled it for factory, library and token but not for pair or router.
+[profile.release]
+opt-level = "z"
+overflow-checks = true
+debug = 0
+strip = "symbols"
+debug-assertions = false
+panic = "abort"
+codegen-units = 1
+lto = true
+
+[profile.release-with-logs]
+inherits = "release"
+debug-assertions = true

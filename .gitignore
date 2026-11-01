@@ -1,0 +1,25 @@
+# Rust
+/target/
+**/target/
+**/*.rs.bk
+
+# Soroban test snapshots (regenerated on every test run)
+**/test_snapshots/
+
+# Local secrets and network config. NEVER commit keys.
+.env
+.env.*
+!.env.example
+.soroban/
+.stellar/
+*.secret
+*.key
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store
+
+# Bindings build output (sources are committed, build artefacts are not)
+bindings/**/node_modules/
+bindings/**/dist/
