@@ -45,7 +45,7 @@ jobs:
           ls -l target/wasm32v1-none/release/veltrixae_*.wasm
           sha256sum target/wasm32v1-none/release/veltrixae_*.wasm
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: veltrixae-wasm
           path: target/wasm32v1-none/release/veltrixae_*.wasm
