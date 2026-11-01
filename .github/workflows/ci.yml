@@ -20,7 +20,7 @@ jobs:
     name: Build WASM and run tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Install Rust (stable, wasm32v1-none)
         uses: dtolnay/rust-toolchain@stable
@@ -45,7 +45,7 @@ jobs:
           ls -l target/wasm32v1-none/release/veltrixae_*.wasm
           sha256sum target/wasm32v1-none/release/veltrixae_*.wasm
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: veltrixae-wasm
           path: target/wasm32v1-none/release/veltrixae_*.wasm
