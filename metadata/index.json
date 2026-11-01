@@ -1,0 +1,84 @@
+{
+  "project": "VELTRIXAE",
+  "soroban_sdk": "22.0.11",
+  "note": "Event topics keep the upstream Soroswap prefixes for indexer compatibility.",
+  "contracts": {
+    "factory": {
+      "wasm": "veltrixae_factory.wasm",
+      "wasm_sha256": "f633cde666930bb8c0b6fe4d06b15b483e51799d5c71ac8df0dc61050b1f9431",
+      "spec": "factory.json",
+      "event_topics": [
+        [
+          "SoroswapFactory",
+          "init"
+        ],
+        [
+          "SoroswapFactory",
+          "new_pair"
+        ],
+        [
+          "SoroswapFactory",
+          "fee_to"
+        ],
+        [
+          "SoroswapFactory",
+          "setter"
+        ],
+        [
+          "SoroswapFactory",
+          "fees"
+        ]
+      ]
+    },
+    "pair": {
+      "wasm": "veltrixae_pair.wasm",
+      "wasm_sha256": "e143ecbad9cc9b7fd78cab3ab66217d9da83a186677648edf8f288797f06aefb",
+      "spec": "pair.json",
+      "event_topics": [
+        [
+          "SoroswapPair",
+          "deposit"
+        ],
+        [
+          "SoroswapPair",
+          "swap"
+        ],
+        [
+          "SoroswapPair",
+          "withdraw"
+        ],
+        [
+          "SoroswapPair",
+          "sync"
+        ],
+        [
+          "SoroswapPair",
+          "skim"
+        ]
+      ]
+    },
+    "router": {
+      "wasm": "veltrixae_router.wasm",
+      "wasm_sha256": "9d733f8352a29d934578e718b7b48f0646c13e7c746e8aad8805f226dd05705c",
+      "spec": "router.json",
+      "event_topics": [
+        [
+          "SoroswapRouter",
+          "init"
+        ],
+        [
+          "SoroswapRouter",
+          "add"
+        ],
+        [
+          "SoroswapRouter",
+          "remove"
+        ],
+        [
+          "SoroswapRouter",
+          "swap"
+        ]
+      ]
+    }
+  }
+}
