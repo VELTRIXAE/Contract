@@ -1,0 +1,58 @@
+# Dependabot configuration for VELTRIXAE contracts.
+# Docs: https://docs.github.com/code-security/dependabot/dependabot-version-updates
+version: 2
+updates:
+  # Rust crates (cargo workspace at the repository root).
+  - package-ecosystem: "cargo"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels: ["dependencies", "rust"]
+    commit-message:
+      prefix: "deps"
+    ignore:
+      # soroban-env-host 22 accepts ed25519-dalek >=2 but does not compile
+      # against 3.x. Revisit when moving to a newer soroban-sdk major.
+      - dependency-name: "ed25519-dalek"
+        update-types: ["version-update:semver-major"]
+    groups:
+      # The Soroban SDK crates must move together; a major bump changes the
+      # host interface and needs manual review and a full test run.
+      soroban:
+        patterns:
+          - "soroban-*"
+      rust-minor-and-patch:
+        update-types: ["minor", "patch"]
+        exclude-patterns:
+          - "soroban-*"
+
+  # TypeScript contract bindings consumed by veltrixae-frontend and
+  # veltrixae-aggregator.
+  - package-ecosystem: "npm"
+    directories:
+      - "/bindings/factory"
+      - "/bindings/pair"
+      - "/bindings/router"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels: ["dependencies", "bindings"]
+    commit-message:
+      prefix: "deps(bindings)"
+    groups:
+      stellar-sdk:
+        patterns:
+          - "@stellar/*"
+
+  # GitHub Actions used by CI.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    labels: ["dependencies", "ci"]
+    commit-message:
+      prefix: "ci"
