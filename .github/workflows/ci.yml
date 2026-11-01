@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    name: Build WASM and run tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust (stable, wasm32v1-none)
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32v1-none
+          components: clippy
+
+      - uses: Swatinem/rust-cache@v2
+
+      # Integration tests load the compiled WASM, so build first.
+      - name: Build contracts
+        run: cargo build --target wasm32v1-none --release --locked
+
+      - name: Run tests
+        run: cargo test --locked
+
+      - name: Clippy (correctness lints)
+        run: cargo clippy --all-targets --locked -- -A clippy::all -D clippy::correctness
+
+      - name: Report WASM sizes and hashes
+        run: |
+          ls -l target/wasm32v1-none/release/veltrixae_*.wasm
+          sha256sum target/wasm32v1-none/release/veltrixae_*.wasm
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: veltrixae-wasm
+          path: target/wasm32v1-none/release/veltrixae_*.wasm
+          if-no-files-found: error
