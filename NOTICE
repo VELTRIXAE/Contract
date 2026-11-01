@@ -1,0 +1,12 @@
+VELTRIXAE Contracts
+Copyright (c) 2026 VELTRIXAE
+
+This product includes software developed by the Soroswap / PaltaLabs
+contributors as part of Soroswap Core (https://github.com/soroswap/core),
+licensed under the Apache License, Version 2.0 (see LICENSE-APACHE).
+
+The contracts in contracts/ were imported from Soroswap Core at upstream
+commit 6eade008ee6794075ad941609e0fef0d1124d3eb and have since been modified.
+See docs/UPSTREAM_ATTRIBUTION.md for the list of modifications.
+
+Soroswap Core is itself derived in design from Uniswap V2.
