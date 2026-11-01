@@ -108,5 +108,6 @@ mod initialize;
 mod fee_to_setter;
 mod pairs;
 mod events;
+mod security;
 
 pub mod deterministic;
