@@ -15,10 +15,11 @@ mod math;
 mod strings;
 
 // ANY TOKEN CONTRACT
-// TODO: Simplify this and use a any_token_interface
+// Uses the SEP-41 token client shipped with soroban-sdk instead of importing a
+// compiled token WASM at build time. The called functions (`symbol`, `balance`,
+// `transfer`) and their ABI are identical, so behaviour is unchanged.
 pub mod any_token {
-    soroban_sdk::contractimport!(file = "../token/target/wasm32-unknown-unknown/release/soroban_token_contract.wasm");
-    pub type TokenClient<'a> = Client<'a>;
+    pub type TokenClient<'a> = soroban_sdk::token::TokenClient<'a>;
 }
 
 use storage::*;
