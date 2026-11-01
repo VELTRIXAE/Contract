@@ -1,4 +1,3 @@
-soroban_sdk::contractimport!(
-    file = "../factory/target/wasm32-unknown-unknown/release/soroswap_factory.optimized.wasm"
-);
-pub type SoroswapFactoryClient<'a> = Client<'a>;
+// Factory client generated from the shared interface crate instead of a
+// compiled factory WASM, so the router no longer depends on build order.
+pub use soroswap_factory_interface::SoroswapFactoryClient;
