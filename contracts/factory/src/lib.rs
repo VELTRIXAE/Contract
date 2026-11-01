@@ -7,10 +7,16 @@ mod storage;
 
 use soroban_sdk::{
     contract,
-    contractimpl,
+    contractimpl, contractmeta,
     Address, BytesN, Env,
 };
-use soroswap_factory_interface::{SoroswapFactoryTrait, FactoryError};
+
+// Metadata that is added on to the WASM custom section
+contractmeta!(
+    key = "Description",
+    val = "VELTRIXAE Factory - creates and registers VELTRIXAE Pair contracts (derived from Soroswap Core)"
+);
+use veltrixae_factory_interface::{SoroswapFactoryTrait, FactoryError};
 use pair::{create_contract, Pair, PairError};
 use storage::*;
 

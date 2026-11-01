@@ -45,7 +45,7 @@ fn initialize_initial_values_0() {
     assert_eq!(test.contract.total_supply(), 0);
     assert_eq!(test.contract.k_last(), 0);
     
-    assert_eq!(test.contract.symbol(), String::from_str(&test.env, "TOK0-ABCDEF-SOROSWAP-LP"));
-    assert_eq!(test.contract.name(), String::from_str(&test.env, "TOK0-ABCDEF Soroswap LP Token"));
+    assert_eq!(test.contract.symbol(), String::from_str(&test.env, "TOK0-ABCDEF-VLX-LP"));
+    assert_eq!(test.contract.name(), String::from_str(&test.env, "TOK0-ABCDEF VELTRIXAE LP Token"));
     assert_eq!(test.contract.decimals(), 7);
 }

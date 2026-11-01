@@ -1,7 +1,7 @@
 #![no_std]
 use soroban_sdk::{contract, contractimpl, contractmeta, Address, Env, String}; 
 use num_integer::Roots; 
-use soroswap_factory_interface::SoroswapFactoryClient;
+use veltrixae_factory_interface::SoroswapFactoryClient;
 use soroban_token_sdk::metadata::TokenMetadata;
 
 
@@ -35,7 +35,7 @@ fn create_symbol(e: &Env, symbol_0: &String, symbol_1: &String) -> String {
     let symbol_0_short = symbol_0.take_first_n_chars(&e, 6);
     let symbol_1_short = symbol_1.take_first_n_chars(&e, 6);
     let hyphen = String::from_str(&e, "-");
-    let end = String::from_str(&e, "-SOROSWAP-LP");
+    let end = String::from_str(&e, "-VLX-LP");
     symbol_0_short.concat(&e, hyphen).concat(&e, symbol_1_short).concat(&e, end)
 }
 
@@ -43,14 +43,14 @@ fn create_name(e: &Env, symbol_0: &String, symbol_1: &String) -> String {
     let symbol_0_short = symbol_0.take_first_n_chars(&e, 6);
     let symbol_1_short = symbol_1.take_first_n_chars(&e, 6);
     let hyphen = String::from_str(&e, "-");
-    let end = String::from_str(&e, " Soroswap LP Token");
+    let end = String::from_str(&e, " VELTRIXAE LP Token");
     symbol_0_short.concat(&e, hyphen).concat(&e, symbol_1_short).concat(&e, end)
 }
 
 // Metadata that is added on to the WASM custom section
 contractmeta!(
     key = "Description",
-    val = "Soroswap.Finance Protocol - Constant product AMM with a .3% swap fee"
+    val = "VELTRIXAE Pair - constant product AMM with a 0.3% swap fee (derived from Soroswap Core)"
 );
 
 pub trait SoroswapPairTrait{

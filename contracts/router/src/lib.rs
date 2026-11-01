@@ -1,7 +1,13 @@
 #![no_std]
 use soroban_sdk::token::Client as TokenClient;
-use soroban_sdk::{contract, contractimpl, Address, Env, Vec};
-use soroswap_library::{SoroswapLibraryError};
+use soroban_sdk::{contract, contractimpl, contractmeta, Address, Env, Vec};
+
+// Metadata that is added on to the WASM custom section
+contractmeta!(
+    key = "Description",
+    val = "VELTRIXAE Router - swaps and liquidity management over VELTRIXAE pairs (derived from Soroswap Core)"
+);
+use veltrixae_library::{SoroswapLibraryError};
 
 mod pair;
 mod factory;
@@ -81,7 +87,7 @@ fn add_liquidity_amounts(
         factory_client.create_pair(&token_a, &token_b);
     }
 
-    let (reserve_a, reserve_b) = soroswap_library::get_reserves_with_factory(
+    let (reserve_a, reserve_b) = veltrixae_library::get_reserves_with_factory(
         e.clone(),
         factory.clone(),
         token_a.clone(),
@@ -93,7 +99,7 @@ fn add_liquidity_amounts(
         Ok((amount_a_desired, amount_b_desired))
     } else {
         // We try first with the amount a desired:
-        let amount_b_optimal = soroswap_library::quote(
+        let amount_b_optimal = veltrixae_library::quote(
             amount_a_desired.clone(),
             reserve_a.clone(),
             reserve_b.clone(),
@@ -107,7 +113,7 @@ fn add_liquidity_amounts(
         }
         // If not, we can try with the amount b desired
         else {
-            let amount_a_optimal = soroswap_library::quote(amount_b_desired, reserve_b, reserve_a).map_err(SoroswapLibraryError::from)?;
+            let amount_a_optimal = veltrixae_library::quote(amount_b_desired, reserve_b, reserve_a).map_err(SoroswapLibraryError::from)?;
 
             // This should happen anyway. Because if we were not able to fulfill with our amount_b_desired for our amount_a_desired
             // It is to expect that the amount_a_optimal for that lower amount_b_desired to be lower than the amount_a_desired
@@ -136,7 +142,7 @@ fn swap(e: &Env, factory_address: &Address, amounts: &Vec<i128>, path: &Vec<Addr
         let (input, output): (Address, Address) = (path.get(i).unwrap(), path.get(i + 1).unwrap());
 
         let (token_0, _token_1): (Address, Address) =
-            (soroswap_library::sort_tokens(input.clone(), output.clone()))?;
+            (veltrixae_library::sort_tokens(input.clone(), output.clone()))?;
         
             let amount_out: i128 = amounts.get(i + 1).unwrap();
 
@@ -148,7 +154,7 @@ fn swap(e: &Env, factory_address: &Address, amounts: &Vec<i128>, path: &Vec<Addr
 
         // before the end, "to" must be the next pair... "to" will be the user only at the end
         let to: Address = if i < path.len() - 2 {
-            soroswap_library::pair_for(
+            veltrixae_library::pair_for(
                 e.clone(),
                 factory_address.clone(),
                 output.clone(),
@@ -160,7 +166,7 @@ fn swap(e: &Env, factory_address: &Address, amounts: &Vec<i128>, path: &Vec<Addr
 
         SoroswapPairClient::new(
             &e,
-            &soroswap_library::pair_for(e.clone(), factory_address.clone(), input, output)?,
+            &veltrixae_library::pair_for(e.clone(), factory_address.clone(), input, output)?,
         )
         .swap(&amount_0_out, &amount_1_out, &to);
 
@@ -447,7 +453,7 @@ impl SoroswapRouterTrait for SoroswapRouter {
             amount_b_min,
         )?;
 
-        let pair: Address = soroswap_library::pair_for(
+        let pair: Address = veltrixae_library::pair_for(
             e.clone(),
             factory,
             token_a.clone(),
@@ -516,7 +522,7 @@ impl SoroswapRouterTrait for SoroswapRouter {
         }
 
         // Retrieve the pair's contract address using the Soroswap library
-        let pair: Address = soroswap_library::pair_for(
+        let pair: Address = veltrixae_library::pair_for(
             e.clone(),
             get_factory(&e),
             token_a.clone(),
@@ -530,7 +536,7 @@ impl SoroswapRouterTrait for SoroswapRouter {
         let (amount_0, amount_1) = SoroswapPairClient::new(&e, &pair).withdraw(&to);
 
         // Sort tokens to match the expected order
-        let (token_0, _token_1) = soroswap_library::sort_tokens(token_a.clone(), token_b.clone())?;
+        let (token_0, _token_1) = veltrixae_library::sort_tokens(token_a.clone(), token_b.clone())?;
         let (amount_a, amount_b) = if token_a == token_0 {
             (amount_0, amount_1)
         } else {
@@ -591,7 +597,7 @@ impl SoroswapRouterTrait for SoroswapRouter {
 
         // Get the expected output amounts for each step of the trading route        
         let factory_address = get_factory(&e);
-        let amounts = soroswap_library::get_amounts_out(
+        let amounts = veltrixae_library::get_amounts_out(
             e.clone(),
             factory_address.clone(),
             amount_in,
@@ -604,7 +610,7 @@ impl SoroswapRouterTrait for SoroswapRouter {
         }
         
         // Determine the pair contract address for the first step of the trading route
-        let pair = soroswap_library::pair_for(
+        let pair = veltrixae_library::pair_for(
             e.clone(),
             factory_address.clone(),
             path.get(0).unwrap(),
@@ -660,7 +666,7 @@ impl SoroswapRouterTrait for SoroswapRouter {
 
         // Get the expected input amounts for each step of the trading route
         let factory_address = get_factory(&e);
-        let amounts = soroswap_library::get_amounts_in(
+        let amounts = veltrixae_library::get_amounts_in(
             e.clone(),
             factory_address.clone(),
             amount_out,
@@ -673,7 +679,7 @@ impl SoroswapRouterTrait for SoroswapRouter {
         }
 
         // Determine the pair contract address for the first step of the trading route
-        let pair = soroswap_library::pair_for(
+        let pair = veltrixae_library::pair_for(
             e.clone(),
             factory_address.clone(),
             path.get(0).unwrap(),
@@ -728,7 +734,7 @@ impl SoroswapRouterTrait for SoroswapRouter {
     /// Returns `Result<Address, SoroswapLibraryError>` where `Ok` contains the deterministic address for the pair, and `Err` indicates an error such as identical tokens or an issue with sorting.
     fn router_pair_for(e: Env, token_a: Address, token_b: Address) -> Result<Address, CombinedRouterError> {
         extend_instance_ttl(&e);
-        Ok(soroswap_library::pair_for(
+        Ok(veltrixae_library::pair_for(
             e.clone(),
             get_factory(&e),
             token_a.clone(),
@@ -749,7 +755,7 @@ impl SoroswapRouterTrait for SoroswapRouter {
     ///
     /// Returns `Result<i128, SoroswapLibraryError>` where `Ok` contains the calculated equivalent amount, and `Err` indicates an error such as insufficient amount or liquidity
     fn router_quote(amount_a: i128, reserve_a: i128, reserve_b: i128) -> Result<i128, CombinedRouterError> {
-        Ok(soroswap_library::quote(amount_a, reserve_a, reserve_b)?)
+        Ok(veltrixae_library::quote(amount_a, reserve_a, reserve_b)?)
     }
 
     /// Given an input amount of an asset and pair reserves, returns the maximum output amount of the other asset.
@@ -764,7 +770,7 @@ impl SoroswapRouterTrait for SoroswapRouter {
     ///
     /// Returns `Result<i128, SoroswapLibraryError>` where `Ok` contains the calculated maximum output amount, and `Err` indicates an error such as insufficient input amount or liquidity.
     fn router_get_amount_out(amount_in: i128, reserve_in: i128, reserve_out: i128) -> Result<i128, CombinedRouterError> {
-        Ok(soroswap_library::get_amount_out(amount_in, reserve_in, reserve_out)?)
+        Ok(veltrixae_library::get_amount_out(amount_in, reserve_in, reserve_out)?)
     }
 
     /// Given an output amount of an asset and pair reserves, returns a required input amount of the other asset.
@@ -779,7 +785,7 @@ impl SoroswapRouterTrait for SoroswapRouter {
     ///
     /// Returns `Result<i128, SoroswapLibraryError>` where `Ok` contains the required input amount, and `Err` indicates an error such as insufficient output amount or liquidity.
     fn router_get_amount_in(amount_out: i128, reserve_in: i128, reserve_out: i128) -> Result<i128, CombinedRouterError> {
-        Ok(soroswap_library::get_amount_in(amount_out, reserve_in, reserve_out)?)
+        Ok(veltrixae_library::get_amount_in(amount_out, reserve_in, reserve_out)?)
     }
 
 
@@ -798,7 +804,7 @@ impl SoroswapRouterTrait for SoroswapRouter {
         check_initialized(&e)?;
         extend_instance_ttl(&e);
         let factory = get_factory(&e);
-        Ok(soroswap_library::get_amounts_out(e, factory, amount_in, path)?)
+        Ok(veltrixae_library::get_amounts_out(e, factory, amount_in, path)?)
     }
 
     /// Performs chained get_amount_in calculations on any number of pairs.
@@ -816,7 +822,7 @@ impl SoroswapRouterTrait for SoroswapRouter {
         check_initialized(&e)?;
         extend_instance_ttl(&e);
         let factory = get_factory(&e);
-        Ok(soroswap_library::get_amounts_in(e, factory, amount_out, path)?)
+        Ok(veltrixae_library::get_amounts_in(e, factory, amount_out, path)?)
     }
 
 
