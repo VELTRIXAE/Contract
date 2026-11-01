@@ -3,9 +3,15 @@ use crate::tokens::{sort_tokens, pair_for};
 use crate::error::SoroswapLibraryError;
 
 mod pair {
-    soroban_sdk::contractimport!(
-        file = "./src/soroswap_pair.wasm"
-    );
+    use soroban_sdk::{contractclient, Env};
+
+    /// Minimal client for the only pair method the library needs.
+    /// Replaces the upstream `contractimport!` of a committed pair WASM binary.
+    #[allow(dead_code)]
+    #[contractclient(name = "Client")]
+    pub trait PairReserves {
+        fn get_reserves(e: Env) -> (i128, i128);
+    }
 }
 use pair::Client as SoroswapPairClient;
 

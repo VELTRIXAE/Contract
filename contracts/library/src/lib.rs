@@ -1,8 +1,7 @@
 #![no_std] 
-use soroban_sdk::{
-    contract, contractimpl,
-    Address, Env, Vec, 
-};
+use soroban_sdk::{Address, Env, Vec};
+#[cfg(any(test, feature = "contract"))]
+use soroban_sdk::{contract, contractimpl};
 
 mod test;
 mod tokens;
@@ -162,9 +161,14 @@ pub trait SoroswapLibraryTrait {
    
 }
 
+// The deployable library contract is opt-in. Without this gate, every
+// `#[contractimpl]` function would be exported from any contract that links
+// this crate (for example the router WASM).
+#[cfg(any(test, feature = "contract"))]
 #[contract]
 pub struct SoroswapLibrary;
 
+#[cfg(any(test, feature = "contract"))]
 #[contractimpl]
 impl SoroswapLibraryTrait for SoroswapLibrary {
 
