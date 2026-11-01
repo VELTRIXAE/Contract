@@ -1,10 +1,17 @@
 // Import necessary types from the Soroban SDK
 #![allow(unused)]
-use soroban_sdk::{contracttype, contracterror, xdr::ToXdr, Address, Bytes, BytesN, Env};
+use soroban_sdk::{contractclient, contracttype, contracterror, xdr::ToXdr, Address, Bytes, BytesN, Env};
 
-soroban_sdk::contractimport!(
-    file = "../pair/target/wasm32-unknown-unknown/release/soroswap_pair.wasm"
-);
+/// Client for the single pair method the factory calls.
+///
+/// Upstream generated this client with `contractimport!` from the compiled
+/// pair WASM, which forced the pair to be built before the factory. The ABI is
+/// identical: `initialize(factory, token_0, token_1)`; a pair error aborts the
+/// whole `create_pair` invocation exactly as before.
+#[contractclient(name = "Client")]
+pub trait PairInitialize {
+    fn initialize(e: Env, factory: Address, token_0: Address, token_1: Address);
+}
 
 #[contracterror]
 #[derive(Copy, Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
@@ -38,7 +45,7 @@ impl Pair {
         salt.append(&self.1.clone().to_xdr(e));
 
         // Hash the salt using SHA256 to generate a new BytesN<32> value
-        e.crypto().sha256(&salt)
+        e.crypto().sha256(&salt).into()
     }
 
     pub fn token_0(&self) -> &Address {
@@ -73,5 +80,5 @@ pub fn create_contract(
     // Use the deployer() method of the current environment to create a new contract instance
     e.deployer()
         .with_current_contract(token_pair.salt(&e)) // Use the salt as a unique identifier for the new contract instance
-        .deploy(pair_wasm_hash) // Deploy the new contract instance using the given pair_wasm_hash value
+        .deploy_v2(pair_wasm_hash, ()) // Deploy the new contract instance (no constructor arguments)
 }
