@@ -54,8 +54,14 @@ impl SoroswapPairToken {
     pub fn total_supply(e: Env) -> i128 {
         read_total_supply(&e)
     }
+}
 
-    #[cfg(test)]
+// Test-only helper kept in its own impl block: a #[cfg(test)] method inside a
+// shared #[contractimpl] block leaves dangling generated symbols in non-test
+// host builds (e.g. clippy --all-targets).
+#[cfg(test)]
+#[contractimpl]
+impl SoroswapPairToken {
     pub fn get_allowance(e: Env, from: Address, spender: Address) -> Option<AllowanceValue> {
         let key = DataKey::Allowance(AllowanceDataKey { from, spender });
         let allowance = e.storage().temporary().get::<_, AllowanceValue>(&key);

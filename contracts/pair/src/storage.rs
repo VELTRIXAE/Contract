@@ -3,7 +3,6 @@ use soroban_sdk::{ Env, Address, ConversionError,
 
 #[derive(Clone, Copy)] 
 #[repr(u32)]
-
 pub enum DataKey {
     Token0 = 0, // token0, instance type of data;
     Token1 = 1, // token1, instance type of data;
@@ -67,12 +66,7 @@ get(&DataKey::Reserve1).unwrap()
 
 
 pub fn get_klast(e: &Env) -> i128 {
-    if let Some(klast) = e.storage().instance().
-get(&DataKey::KLast) {
-        klast
-    } else {
-        0
-    }
+    e.storage().instance().get(&DataKey::KLast).unwrap_or(0)
 }
 
 pub fn put_factory(e: &Env, factory: Address) {

@@ -38,7 +38,7 @@ fmt-check:
 	cargo fmt --all -- --check
 
 lint:
-	cargo clippy --all-targets -- -D clippy::correctness -D clippy::suspicious
+	cargo clippy --all-targets -- -A clippy::all -D clippy::correctness
 
 ## Generate TypeScript bindings for the frontend and aggregator.
 bindings: build
