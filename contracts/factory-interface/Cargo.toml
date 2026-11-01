@@ -1,7 +1,7 @@
 [package]
-name = "soroswap-factory-interface"
+name = "veltrixae-factory-interface"
 version = "0.0.1"
-authors = ["esteblock <esteblock@paltalabs.io>"]
+authors = ["VELTRIXAE", "esteblock <esteblock@paltalabs.io> (Soroswap upstream)"]
 edition.workspace = true
 license.workspace = true
 publish = false

@@ -1,5 +1,5 @@
 use soroban_sdk::{self, contracterror};
-use soroswap_library::{SoroswapLibraryError};
+use veltrixae_library::{SoroswapLibraryError};
 
 
 #[contracterror]

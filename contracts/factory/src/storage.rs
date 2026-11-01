@@ -1,7 +1,7 @@
 use soroban_sdk::{
     contracttype, Address, BytesN, Env, Val, TryFromVal
 };
-use soroswap_factory_interface::{FactoryError};
+use veltrixae_factory_interface::{FactoryError};
 use crate::pair::{Pair};
 
 

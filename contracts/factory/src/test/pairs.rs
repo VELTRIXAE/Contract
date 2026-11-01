@@ -2,7 +2,7 @@ use crate::test::{SoroswapFactoryTest, SoroswapPairClient};
 use soroban_sdk::{xdr::{ToXdr},
     Bytes,
 };
-use soroswap_factory_interface::{FactoryError};
+use veltrixae_factory_interface::{FactoryError};
 
 
 #[test]

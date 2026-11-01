@@ -1,8 +1,8 @@
 [package]
-name = "soroswap-router"
+name = "veltrixae-router"
 version = "0.0.1"
-description = "Swap of tokens when a direct pair does not exist, by using a given paths. It will also handle liquidity provision and manage deposit and withdrawal functions for liquidity providers."
-authors = ["esteblock <esteblock@paltalabs.io>"]
+description = "VELTRIXAE Router: user-facing entry point for swaps (single and multi-hop) and liquidity management"
+authors = ["VELTRIXAE", "esteblock <esteblock@paltalabs.io> (Soroswap upstream)"]
 edition.workspace = true
 license.workspace = true
 publish = false
@@ -14,8 +14,8 @@ doctest = false
 [dependencies]
 soroban-sdk = { workspace = true }
 num-integer = { workspace = true }
-soroswap-library = { path = "../library" }
-soroswap-factory-interface = { path = "../factory-interface" }
+veltrixae-library = { path = "../library" }
+veltrixae-factory-interface = { path = "../factory-interface" }
 
 [dev-dependencies]
 soroban-sdk = { workspace = true, features = ["testutils"] }

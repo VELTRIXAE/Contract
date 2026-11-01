@@ -5,25 +5,25 @@ use soroban_sdk::{Env, BytesN, Address, testutils::Address as _};
 use crate::{SoroswapLibrary, SoroswapLibraryClient};
 
 mod token {
-    soroban_sdk::contractimport!(file = "../../target/wasm32v1-none/release/soroban_token_contract.wasm");
+    soroban_sdk::contractimport!(file = "../../target/wasm32v1-none/release/veltrixae_test_token.wasm");
     pub type TokenClient<'a> = Client<'a>;
 }
 
 mod pair {
-    soroban_sdk::contractimport!(file = "../../target/wasm32v1-none/release/soroswap_pair.wasm");
+    soroban_sdk::contractimport!(file = "../../target/wasm32v1-none/release/veltrixae_pair.wasm");
     pub type SoroswapPairClient<'a> = Client<'a>;
 }
 
 
 fn pair_contract_wasm(e: &Env) -> BytesN<32> {
     soroban_sdk::contractimport!(
-        file = "../../target/wasm32v1-none/release/soroswap_pair.wasm"
+        file = "../../target/wasm32v1-none/release/veltrixae_pair.wasm"
     );
     e.deployer().upload_contract_wasm(WASM)
 }
 
 mod factory {
-    soroban_sdk::contractimport!(file = "../../target/wasm32v1-none/release/soroswap_factory.wasm");
+    soroban_sdk::contractimport!(file = "../../target/wasm32v1-none/release/veltrixae_factory.wasm");
     pub type SoroswapFactoryClient<'a> = Client<'a>;
 }
 
@@ -51,7 +51,7 @@ fn create_soroswap_factory<'a>(e: & Env, setter: & Address) -> SoroswapFactoryCl
     factory
 }
 
-fn create_soroswap_library_contract<'a>(e: &Env) -> SoroswapLibraryClient<'a> {
+fn create_veltrixae_library_contract<'a>(e: &Env) -> SoroswapLibraryClient<'a> {
     SoroswapLibraryClient::new(e, &e.register(SoroswapLibrary, ()))
 }
 
@@ -71,7 +71,7 @@ impl<'a> SoroswapLibraryTest<'a> {
 
         let env = Env::default();
         env.mock_all_auths();
-        let contract = create_soroswap_library_contract(&env);
+        let contract = create_veltrixae_library_contract(&env);
 
         let admin = Address::generate(&env);
         let user = Address::generate(&env);

@@ -1,5 +1,5 @@
 [package]
-name = "soroban-token-contract"
+name = "veltrixae-test-token"
 description = "Soroban standard token contract (used only as a test token)"
 version = "0.0.6"
 edition.workspace = true

@@ -9,7 +9,7 @@ use soroban_sdk::{
     Symbol
 };
 //use super::*; // Import the necessary modules and types
-use soroswap_factory_interface::{FactoryError};
+use veltrixae_factory_interface::{FactoryError};
 
 
 #[test]

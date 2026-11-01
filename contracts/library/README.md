@@ -15,12 +15,12 @@ soroswap-library = "<desired version>"
 
 2.- Import it:
 ```rust
-use soroswap_library;
+use veltrixae_library;
 ```
 
 3.- Use it:
 ```rust
-let quote = soroswap_library::quote(amount_a, reserve_a, reserve_b)
+let quote = veltrixae_library::quote(amount_a, reserve_a, reserve_b)
 ```
 
 ## How to publish:

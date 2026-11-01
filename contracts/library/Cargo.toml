@@ -1,8 +1,8 @@
 [package]
-name = "soroswap-library"
+name = "veltrixae-library"
 version = "2.0.0"
-description = "Library that enables efficient and optimized code execution across different contracts on the Soroswap.Finance protocol"
-authors = ["esteblock <esteblock@paltalabs.io>"]
+description = "VELTRIXAE AMM library: pair address derivation, reserve lookup and constant-product quote math (derived from soroswap-library)"
+authors = ["VELTRIXAE", "esteblock <esteblock@paltalabs.io> (Soroswap upstream)"]
 edition.workspace = true
 license.workspace = true
 publish = false

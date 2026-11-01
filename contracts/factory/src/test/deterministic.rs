@@ -25,15 +25,15 @@ use soroban_sdk::{
 use core::mem;
 
 mod pair {
-    soroban_sdk::contractimport!(file = "../../target/wasm32v1-none/release/soroswap_pair.wasm");
+    soroban_sdk::contractimport!(file = "../../target/wasm32v1-none/release/veltrixae_pair.wasm");
     pub type SoroswapPairClient<'a> = Client<'a>;
 }
 mod token {
-    soroban_sdk::contractimport!(file = "../../target/wasm32v1-none/release/soroban_token_contract.wasm");
+    soroban_sdk::contractimport!(file = "../../target/wasm32v1-none/release/veltrixae_test_token.wasm");
     pub type TokenClient<'a> = Client<'a>;
 }
 mod factory {
-    soroban_sdk::contractimport!(file = "../../target/wasm32v1-none/release/soroswap_factory.wasm");
+    soroban_sdk::contractimport!(file = "../../target/wasm32v1-none/release/veltrixae_factory.wasm");
     pub type _SoroswapFactoryClient<'a> = Client<'a>; 
 }
 use pair::SoroswapPairClient;
