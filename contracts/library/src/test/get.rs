@@ -122,6 +122,29 @@ fn get_amount_in_insufficient_liquidity_1() {
 
 
 #[test]
+fn get_amount_in_output_equal_to_reserve() {
+    let test = SoroswapLibraryTest::setup();
+    let result = test.contract.try_get_amount_in(&100, &100, &100);
+    assert_eq!(result, Err(Ok(SoroswapLibraryError::InsufficientLiquidity)));
+}
+
+#[test]
+fn get_amount_in_output_greater_than_reserve() {
+    let test = SoroswapLibraryTest::setup();
+    // Previously returned a negative amount_in instead of an error.
+    let result = test.contract.try_get_amount_in(&101, &100, &100);
+    assert_eq!(result, Err(Ok(SoroswapLibraryError::InsufficientLiquidity)));
+}
+
+#[test]
+fn get_amount_in_largest_valid_output() {
+    let test = SoroswapLibraryTest::setup();
+    // amount_out = reserve_out - 1 is the largest payable amount.
+    // ceil(100 * 99 * 1000 / ((100 - 99) * 997)) + 1 = 9930 + 1
+    assert_eq!(test.contract.get_amount_in(&99, &100, &100), 9931);
+}
+
+#[test]
 fn get_amounts_out() {
     let test = SoroswapLibraryTest::setup();
     

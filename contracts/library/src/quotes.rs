@@ -72,6 +72,12 @@ pub fn get_amount_in(amount_out: i128, reserve_in: i128, reserve_out: i128) -> R
     if reserve_in <= 0 || reserve_out <= 0 {
         return Err(SoroswapLibraryError::InsufficientLiquidity);
     }
+    // VELTRIXAE: the pool can never pay out its whole reserve. Without this
+    // check `reserve_out - amount_out` is zero (division by zero -> panic) or
+    // negative, which produced a *negative* required input amount.
+    if amount_out >= reserve_out {
+        return Err(SoroswapLibraryError::InsufficientLiquidity);
+    }
     let numerator = reserve_in.checked_mul(amount_out).unwrap().checked_mul(1000).unwrap();
     let denominator = reserve_out.checked_sub(amount_out).unwrap().checked_mul(997).unwrap();
     Ok(numerator.checked_ceiling_div(denominator).unwrap().checked_add(1).unwrap())

@@ -97,6 +97,15 @@ fn try_router_get_amount_in_insufficient_liquidity_1() {
 }
 
 
+#[test]
+fn try_router_get_amount_in_output_exceeds_reserve() {
+    let test = SoroswapRouterTest::setup();
+    let result = test.contract.try_router_get_amount_in(&100, &100, &100);
+    assert_eq!(result, Err(Ok(CombinedRouterError::LibraryInsufficientLiquidity)));
+    let result = test.contract.try_router_get_amount_in(&500, &100, &100);
+    assert_eq!(result, Err(Ok(CombinedRouterError::LibraryInsufficientLiquidity)));
+}
+
 // router_get_amounts_out
 
 
