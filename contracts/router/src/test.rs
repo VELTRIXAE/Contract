@@ -15,7 +15,7 @@ mod token {
     soroban_sdk::contractimport!(file = "../../target/wasm32v1-none/release/veltrixae_test_token.wasm");
     pub type TokenClient<'a> = Client<'a>;
 }
-use token::TokenClient;
+pub use token::TokenClient;
 
 pub fn create_token_contract<'a>(e: &Env, admin: & Address) -> TokenClient<'a> {
     TokenClient::new(&e, &e.register_stellar_asset_contract(admin.clone()))
@@ -146,6 +146,7 @@ pub mod library_functions;
 pub mod swap_tokens_for_exact_tokens;
 pub mod swap_exact_tokens_for_tokens;
 pub mod events;
+pub mod security;
 
 // BUDGET TEST MOD
 mod budget;
