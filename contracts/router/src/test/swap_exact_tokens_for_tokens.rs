@@ -108,24 +108,55 @@ fn try_swap_exact_tokens_for_tokens_invalid_path() {
 
 
 #[test]
-// Panics because LP does not exist; here panics with a Error(Storage, MissingValue)
-// We should implement a pair_address.exist() without needing to call the Factory
-#[should_panic]
-fn swap_exact_tokens_for_tokens_pair_does_not_exist() {
+fn try_swap_exact_tokens_for_tokens_pair_does_not_exist() {
     let test = SoroswapRouterTest::setup();
     test.contract.initialize(&test.factory.address);
-    let deadline: u64 = test.env.ledger().timestamp() + 1000;  
+    let deadline: u64 = test.env.ledger().timestamp() + 1000;
 
     let mut path: Vec<Address> = Vec::new(&test.env);
     path.push_back(test.token_0.address.clone());
     path.push_back(test.token_1.address.clone());
 
-    test.contract.swap_exact_tokens_for_tokens(
-        &0, //amount_in
-        &0,  // amount_out_min
+    // VELTRIXAE: the router validates every hop against the factory and
+    // returns a typed error instead of trapping on a missing pair contract.
+    let result = test.contract.try_swap_exact_tokens_for_tokens(
+        &1, // amount_in
+        &1, // limit
         &path, // path
         &test.user, // to
         &deadline); // deadline
+    assert_eq!(result, Err(Ok(CombinedRouterError::RouterPairDoesNotExist)));
+}
+
+#[test]
+fn try_swap_exact_tokens_for_tokens_second_hop_does_not_exist() {
+    let test = SoroswapRouterTest::setup();
+    test.contract.initialize(&test.factory.address);
+    let deadline: u64 = test.env.ledger().timestamp() + 1000;
+    add_liquidity(&test, &1_000_000_000, &4_000_000_000);
+
+    // token_0 -> token_1 exists, token_1 -> token_2 does not.
+    let token_2 = create_token_contract(&test.env, &test.admin);
+    let path: Vec<Address> = vec![&test.env,
+        test.token_0.address.clone(),
+        test.token_1.address.clone(),
+        token_2.address.clone()];
+    let result = test.contract.try_swap_exact_tokens_for_tokens(&1_000, &1_000_000, &path, &test.user, &deadline);
+    assert_eq!(result, Err(Ok(CombinedRouterError::RouterPairDoesNotExist)));
+}
+
+#[test]
+fn try_swap_exact_tokens_for_tokens_repeated_token_in_path() {
+    let test = SoroswapRouterTest::setup();
+    test.contract.initialize(&test.factory.address);
+    let deadline: u64 = test.env.ledger().timestamp() + 1000;
+    add_liquidity(&test, &1_000_000_000, &4_000_000_000);
+
+    let path: Vec<Address> = vec![&test.env,
+        test.token_0.address.clone(),
+        test.token_0.address.clone()];
+    let result = test.contract.try_swap_exact_tokens_for_tokens(&1_000, &1_000_000, &path, &test.user, &deadline);
+    assert_eq!(result, Err(Ok(CombinedRouterError::LibrarySortIdenticalTokens)));
 }
 
 #[test]

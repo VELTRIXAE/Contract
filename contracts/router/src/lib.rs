@@ -45,6 +45,31 @@ fn ensure_deadline(e: &Env, timestamp: u64) -> Result<(), CombinedRouterError> {
 }
 
 
+/// Validates a swap route before any tokens move.
+///
+/// VELTRIXAE addition. Upstream discovered a missing pair only when the
+/// cross-contract call to a non-existent pair address trapped, which surfaced
+/// as an opaque host error. Every hop must now be a pair registered in the
+/// factory, so routes through unknown or unsupported token contracts are
+/// rejected with `RouterPairDoesNotExist` (509), and routes shorter than two
+/// tokens with `LibraryInvalidPath` (514).
+fn validate_path(e: &Env, factory: &Address, path: &Vec<Address>) -> Result<(), CombinedRouterError> {
+    if path.len() < 2 {
+        return Err(CombinedRouterError::LibraryInvalidPath);
+    }
+    let factory_client = SoroswapFactoryClient::new(e, factory);
+    for i in 0..path.len() - 1 {
+        let (input, output) = (path.get(i).unwrap(), path.get(i + 1).unwrap());
+        if input == output {
+            return Err(CombinedRouterError::LibrarySortIdenticalTokens);
+        }
+        if !factory_client.pair_exists(&input, &output) {
+            return Err(SoroswapRouterError::PairDoesNotExist.into());
+        }
+    }
+    Ok(())
+}
+
 fn check_initialized(e: &Env) -> Result<(), CombinedRouterError> {
     if has_factory(e) {
         Ok(())
@@ -597,6 +622,7 @@ impl SoroswapRouterTrait for SoroswapRouter {
 
         // Get the expected output amounts for each step of the trading route        
         let factory_address = get_factory(&e);
+        validate_path(&e, &factory_address, &path)?;
         let amounts = veltrixae_library::get_amounts_out(
             e.clone(),
             factory_address.clone(),
@@ -666,6 +692,7 @@ impl SoroswapRouterTrait for SoroswapRouter {
 
         // Get the expected input amounts for each step of the trading route
         let factory_address = get_factory(&e);
+        validate_path(&e, &factory_address, &path)?;
         let amounts = veltrixae_library::get_amounts_in(
             e.clone(),
             factory_address.clone(),
