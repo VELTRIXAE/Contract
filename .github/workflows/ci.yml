@@ -50,3 +50,23 @@ jobs:
           name: veltrixae-wasm
           path: target/wasm32v1-none/release/veltrixae_*.wasm
           if-no-files-found: error
+
+  bindings:
+    name: Build TypeScript bindings
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        contract: [factory, pair, router]
+    defaults:
+      run:
+        working-directory: bindings/${{ matrix.contract }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: bindings/${{ matrix.contract }}/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm run build
