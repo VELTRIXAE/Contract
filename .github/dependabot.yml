@@ -17,6 +17,13 @@ updates:
       # against 3.x. Revisit when moving to a newer soroban-sdk major.
       - dependency-name: "ed25519-dalek"
         update-types: ["version-update:semver-major"]
+      # A soroban-sdk major changes the host interface and the contract
+      # APIs (and needs a newer stellar-cli). Migrate deliberately on a
+      # branch; let Dependabot propose only 22.x patch/minor updates.
+      - dependency-name: "soroban-sdk"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "soroban-token-sdk"
+        update-types: ["version-update:semver-major"]
     groups:
       # The Soroban SDK crates must move together; a major bump changes the
       # host interface and needs manual review and a full test run.
@@ -42,6 +49,12 @@ updates:
     labels: ["dependencies", "bindings"]
     commit-message:
       prefix: "deps(bindings)"
+    ignore:
+      # The generated tsconfig (from soroban-spec-typescript) does not yet
+      # build with TypeScript 7 (TS5011 rootDir). Revisit when the generator
+      # template supports it.
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
     groups:
       stellar-sdk:
         patterns:
