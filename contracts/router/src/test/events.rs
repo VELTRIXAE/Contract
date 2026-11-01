@@ -96,10 +96,10 @@ fn add_liquidity_event() {
     let (deposited_amount_0, 
         deposited_amount_1, 
         received_liquidity) =add_liquidity(&test, &amount_0, &amount_1);
-    let deterministic_pair_address = test.contract.router_pair_for(&test.token_0.address, &test.token_1.address);
-
-
+    // Since soroban-sdk 21, `events().all()` only returns the events of the
+    // last invocation, so capture them before calling `router_pair_for`.
     let add_liquidity_event = test.env.events().all().last().unwrap();
+    let deterministic_pair_address = test.contract.router_pair_for(&test.token_0.address, &test.token_1.address);
 
     let expected_add_liquidity_event: AddLiquidityEvent = AddLiquidityEvent {
         token_a: test.token_0.address.clone(),
@@ -214,10 +214,9 @@ fn remove_liquidity_event() {
         &test.user, //     to: Address,
         &desired_deadline//     deadline: u64,
     );
-    let deterministic_pair_address = test.contract.router_pair_for(&test.token_0.address, &test.token_1.address);
-
-
+    // Capture events before the next invocation clears them (soroban-sdk >= 21).
     let remove_liquidity_event = test.env.events().all().last().unwrap();
+    let deterministic_pair_address = test.contract.router_pair_for(&test.token_0.address, &test.token_1.address);
 
     let expected_remove_liquidity_event: RemoveLiquidityEvent = RemoveLiquidityEvent {
         token_a: test.token_0.address.clone(),
