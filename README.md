@@ -87,8 +87,10 @@ No VELTRIXAE contracts have been deployed from this repository yet.
 - [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md): testnet build, deploy, verify
 - [docs/TESTING.md](docs/TESTING.md): test suites and how to run them
 - [docs/UPSTREAM_ATTRIBUTION.md](docs/UPSTREAM_ATTRIBUTION.md): what came from Soroswap and what changed
+- [docs/TECHNICAL_AUDIT.md](docs/TECHNICAL_AUDIT.md): verified build/test status and audit findings
 - [SECURITY.md](SECURITY.md): threat model, known limitations, reporting
 - [CONTRIBUTING.md](CONTRIBUTING.md): development workflow
+- [CHANGELOG.md](CHANGELOG.md): notable changes
 
 ## License
 
