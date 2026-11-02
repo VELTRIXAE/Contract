@@ -7,7 +7,8 @@ mod metadata;
 mod storage_types;
 mod total_supply;
 
-pub use contract::SoroswapPairTokenClient; 
 pub use contract::SoroswapPairToken;
-pub use contract::{internal_mint, internal_burn};
+#[cfg(test)]
+pub use contract::SoroswapPairTokenClient;
+pub use contract::{internal_burn, internal_mint};
 pub use metadata::write_metadata;

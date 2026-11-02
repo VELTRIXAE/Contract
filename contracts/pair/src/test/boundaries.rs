@@ -5,16 +5,21 @@ use crate::test::pair::SoroswapPairError;
 use crate::test::SoroswapPairTest;
 
 fn init(test: &SoroswapPairTest) {
-    test.contract
-        .initialize(&test.factory.address, &test.token_0.address, &test.token_1.address);
+    test.contract.initialize(
+        &test.factory.address,
+        &test.token_0.address,
+        &test.token_1.address,
+    );
 }
 
 fn send(test: &SoroswapPairTest, amount_0: i128, amount_1: i128) {
     if amount_0 > 0 {
-        test.token_0.transfer(&test.user, &test.contract.address, &amount_0);
+        test.token_0
+            .transfer(&test.user, &test.contract.address, &amount_0);
     }
     if amount_1 > 0 {
-        test.token_1.transfer(&test.user, &test.contract.address, &amount_1);
+        test.token_1
+            .transfer(&test.user, &test.contract.address, &amount_1);
     }
 }
 
@@ -27,7 +32,10 @@ fn first_deposit_at_minimum_liquidity_is_rejected() {
     // sqrt(1000 * 1000) = 1000 = MINIMUM_LIQUIDITY -> nothing left for the user.
     send(&test, 1000, 1000);
     let res = test.contract.try_deposit(&test.user);
-    assert_eq!(res, Err(Ok(SoroswapPairError::DepositInsufficientFirstLiquidity)));
+    assert_eq!(
+        res,
+        Err(Ok(SoroswapPairError::DepositInsufficientFirstLiquidity))
+    );
 }
 
 #[test]
@@ -73,7 +81,7 @@ fn additional_liquidity_rounds_down() {
     let test = SoroswapPairTest::setup();
     init(&test);
     add_liquidity(&test, &1_000_000, &4_000_000); // total supply 2_000_000
-    // shares_0 = 1 * 2e6 / 1e6 = 2, shares_1 = 3 * 2e6 / 4e6 = 1 (1.5 floored)
+                                                  // shares_0 = 1 * 2e6 / 1e6 = 2, shares_1 = 3 * 2e6 / 4e6 = 1 (1.5 floored)
     let minted = add_liquidity(&test, &1, &3);
     assert_eq!(minted, 1);
 }
@@ -86,7 +94,10 @@ fn additional_liquidity_that_rounds_to_zero_is_rejected() {
     // shares_1 = 1 * 2e6 / 4e6 = 0 -> min(2, 0) = 0
     send(&test, 1, 1);
     let res = test.contract.try_deposit(&test.user);
-    assert_eq!(res, Err(Ok(SoroswapPairError::DepositInsufficientLiquidityMinted)));
+    assert_eq!(
+        res,
+        Err(Ok(SoroswapPairError::DepositInsufficientLiquidityMinted))
+    );
 }
 
 #[test]
@@ -110,7 +121,8 @@ fn minimum_liquidity_stays_locked_after_full_withdrawal() {
     let minted = add_liquidity(&test, &10_000, &10_000);
     assert_eq!(minted, 9_000);
 
-    test.contract.transfer(&test.user, &test.contract.address, &minted);
+    test.contract
+        .transfer(&test.user, &test.contract.address, &minted);
     let (out_0, out_1) = test.contract.withdraw(&test.user);
     // 10_000 * 9_000 / 10_000
     assert_eq!((out_0, out_1), (9_000, 9_000));
@@ -119,7 +131,10 @@ fn minimum_liquidity_stays_locked_after_full_withdrawal() {
 
     // The locked 1000 shares can never be withdrawn.
     let res = test.contract.try_withdraw(&test.user);
-    assert_eq!(res, Err(Ok(SoroswapPairError::WithdrawInsufficientSentShares)));
+    assert_eq!(
+        res,
+        Err(Ok(SoroswapPairError::WithdrawInsufficientSentShares))
+    );
 }
 
 #[test]
@@ -127,10 +142,14 @@ fn withdraw_rounds_down_in_favour_of_the_pool() {
     let test = SoroswapPairTest::setup();
     init(&test);
     add_liquidity(&test, &1_000_000, &4_000_000); // supply 2_000_000
-    // Burning 1 share: 1e6 * 1 / 2e6 = 0 -> rejected rather than paying 0.
-    test.contract.transfer(&test.user, &test.contract.address, &1);
+                                                  // Burning 1 share: 1e6 * 1 / 2e6 = 0 -> rejected rather than paying 0.
+    test.contract
+        .transfer(&test.user, &test.contract.address, &1);
     let res = test.contract.try_withdraw(&test.user);
-    assert_eq!(res, Err(Ok(SoroswapPairError::WithdrawInsufficientLiquidityBurned)));
+    assert_eq!(
+        res,
+        Err(Ok(SoroswapPairError::WithdrawInsufficientLiquidityBurned))
+    );
 }
 
 #[test]
@@ -139,7 +158,10 @@ fn withdraw_without_sending_shares_is_rejected() {
     init(&test);
     add_liquidity(&test, &1_000_000, &4_000_000);
     let res = test.contract.try_withdraw(&test.user);
-    assert_eq!(res, Err(Ok(SoroswapPairError::WithdrawInsufficientSentShares)));
+    assert_eq!(
+        res,
+        Err(Ok(SoroswapPairError::WithdrawInsufficientSentShares))
+    );
 }
 
 // ---------- swaps, fees and the K invariant ----------

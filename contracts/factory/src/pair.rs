@@ -1,6 +1,8 @@
 // Import necessary types from the Soroban SDK
 #![allow(unused)]
-use soroban_sdk::{contractclient, contracttype, contracterror, xdr::ToXdr, Address, Bytes, BytesN, Env};
+use soroban_sdk::{
+    contractclient, contracterror, contracttype, xdr::ToXdr, Address, Bytes, BytesN, Env,
+};
 
 /// Client for the single pair method the factory calls.
 ///
@@ -20,7 +22,6 @@ pub enum PairError {
     /// SoroswapFactory: token_a and token_b have identical addresses
     CreatePairIdenticalTokens = 901,
 }
-
 
 #[contracttype]
 #[derive(Clone)]

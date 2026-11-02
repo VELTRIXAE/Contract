@@ -11,7 +11,9 @@ use veltrixae_factory_interface::FactoryError;
 
 /// A classic Stellar account (G...) address, i.e. not a contract.
 fn account_address(e: &Env) -> Address {
-    let sc = ScAddress::Account(AccountId(PublicKey::PublicKeyTypeEd25519(Uint256([7u8; 32]))));
+    let sc = ScAddress::Account(AccountId(PublicKey::PublicKeyTypeEd25519(Uint256(
+        [7u8; 32],
+    ))));
     Address::try_from_val(e, &sc).unwrap()
 }
 
@@ -81,7 +83,8 @@ fn create_pair_does_not_require_any_signature() {
     let test = SoroswapFactoryTest::setup();
     test.contract.initialize(&test.admin, &test.pair_wasm);
     test.env.set_auths(&[]);
-    test.contract.create_pair(&test.token_0.address, &test.token_1.address);
+    test.contract
+        .create_pair(&test.token_0.address, &test.token_1.address);
     assert_eq!(test.contract.all_pairs_length(), 1);
 }
 
@@ -90,9 +93,15 @@ fn create_pair_rejects_account_address_as_token() {
     let test = SoroswapFactoryTest::setup();
     test.contract.initialize(&test.admin, &test.pair_wasm);
     let account = account_address(&test.env);
-    assert!(test.contract.try_create_pair(&test.token_0.address, &account).is_err());
+    assert!(test
+        .contract
+        .try_create_pair(&test.token_0.address, &account)
+        .is_err());
     assert_eq!(test.contract.all_pairs_length(), 0);
-    assert_eq!(test.contract.pair_exists(&test.token_0.address, &account), false);
+    assert_eq!(
+        test.contract.pair_exists(&test.token_0.address, &account),
+        false
+    );
 }
 
 #[test]
@@ -100,7 +109,10 @@ fn create_pair_rejects_undeployed_contract_address() {
     let test = SoroswapFactoryTest::setup();
     test.contract.initialize(&test.admin, &test.pair_wasm);
     let not_deployed = Address::generate(&test.env);
-    assert!(test.contract.try_create_pair(&test.token_0.address, &not_deployed).is_err());
+    assert!(test
+        .contract
+        .try_create_pair(&test.token_0.address, &not_deployed)
+        .is_err());
     assert_eq!(test.contract.all_pairs_length(), 0);
 }
 
@@ -110,7 +122,10 @@ fn create_pair_rejects_non_token_contract() {
     test.contract.initialize(&test.admin, &test.pair_wasm);
     // The factory itself is a contract but does not implement the token interface.
     let factory = test.contract.address.clone();
-    assert!(test.contract.try_create_pair(&test.token_0.address, &factory).is_err());
+    assert!(test
+        .contract
+        .try_create_pair(&test.token_0.address, &factory)
+        .is_err());
     assert_eq!(test.contract.all_pairs_length(), 0);
 }
 
@@ -119,11 +134,23 @@ fn pair_registry_is_order_independent_and_indexed() {
     let test = SoroswapFactoryTest::setup();
     test.contract.initialize(&test.admin, &test.pair_wasm);
 
-    let p01 = test.contract.create_pair(&test.token_1.address, &test.token_0.address);
-    let p23 = test.contract.create_pair(&test.token_2.address, &test.token_3.address);
+    let p01 = test
+        .contract
+        .create_pair(&test.token_1.address, &test.token_0.address);
+    let p23 = test
+        .contract
+        .create_pair(&test.token_2.address, &test.token_3.address);
 
-    assert_eq!(test.contract.get_pair(&test.token_0.address, &test.token_1.address), p01);
-    assert_eq!(test.contract.get_pair(&test.token_1.address, &test.token_0.address), p01);
+    assert_eq!(
+        test.contract
+            .get_pair(&test.token_0.address, &test.token_1.address),
+        p01
+    );
+    assert_eq!(
+        test.contract
+            .get_pair(&test.token_1.address, &test.token_0.address),
+        p01
+    );
     assert_eq!(test.contract.all_pairs(&0), p01);
     assert_eq!(test.contract.all_pairs(&1), p23);
     assert_eq!(test.contract.all_pairs_length(), 2);
@@ -132,7 +159,8 @@ fn pair_registry_is_order_independent_and_indexed() {
         Err(Ok(FactoryError::IndexDoesNotExist))
     );
     assert_eq!(
-        test.contract.try_create_pair(&test.token_0.address, &test.token_1.address),
+        test.contract
+            .try_create_pair(&test.token_0.address, &test.token_1.address),
         Err(Ok(FactoryError::CreatePairAlreadyExists))
     );
 }
