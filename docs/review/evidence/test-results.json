@@ -1,0 +1,1328 @@
+{
+  "command": "make test",
+  "exit_code": 0,
+  "passed": 264,
+  "failed": 0,
+  "tests": [
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::constructors::factory_deployment_without_constructor_arguments_rolls_back",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::constructors::factory_deployment_atomically_initializes_and_rejects_takeover",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::deterministic::alice_bob_ne",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::deterministic::add_pair",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::deterministic::all_pairs_length_is_one",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::deterministic::authorize_bob",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::deterministic::authorized_invocation",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::deterministic::compare_deterministic_address",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::deterministic::compare_pair_address",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::deterministic::compare_deterministic_address_inverted",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::deterministic::create_and_register_factory_contract",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::deterministic::fees_are_not_enabled",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::deterministic::non_authorized_invocation - should panic",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::deterministic::pair_address_eq_both_directions",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::deterministic::pair_exists_both_directions",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::deterministic::pair_does_not_exists_both_directions",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::deterministic::pair_is_unique_and_unequivocal_inverted_order - should panic",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::deterministic::pair_is_unique_and_unequivocal_same_order - should panic",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::deterministic::set_fee_to_address_from_zero_u8",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::deterministic::set_fee_to_factory_address",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::deterministic::set_fee_to_setter_bob",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::deterministic::set_fees_enabled",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::deterministic::setter_is_alice",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::deterministic::setter_is_not_bob",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::deterministic::token_client_ne",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::events::fee_to_event",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::events::fees_enabled_event",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::events::initialized_event",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::events::new_pair_event",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::events::setter_event",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::fee_to_setter::changing_fee_to_setter_with_mock_auth_not_allowed - should panic",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::fee_to_setter::changing_fee_to_with_mock_auth_not_allowed - should panic",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::fee_to_setter::changing_fees_enabled_with_mock_auth_not_allowed - should panic",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::fee_to_setter::changing_with_mock_auth",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::initialize::double_initialize_factory",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::initialize::initialize_basic_info",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::initialize::not_yet_initialized_all_pairs",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::initialize::not_yet_initialized_all_pairs_length",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::initialize::not_yet_initialized_create_pair",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::initialize::not_yet_initialized_fee_enabled",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::initialize::not_yet_initialized_fee_to",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::initialize::not_yet_initialized_fee_to_setter",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::initialize::not_yet_initialized_get_pair",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::initialize::not_yet_initialized_set_fee_to",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::initialize::not_yet_initialized_set_fee_to_setter",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::pairs::create_identical_tokens",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::initialize::not_yet_initialized_set_fees_enabled",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::pairs::create_pair_index_does_not_exist",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::pairs::create_pair_one_way",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::pairs::double_pair_creation",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::pairs::double_pair_creation_other_way",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::pairs::get_pair_does_not_exist",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::pairs::no_pair_index_does_not_exist",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::security::admin_functions_require_setter_signature",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::security::archived_uploaded_pair_code_fails_without_registry_mutation",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::security::create_pair_does_not_require_any_signature",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::security::create_pair_rejects_account_address_as_token",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::security::create_pair_rejects_undeployed_contract_address",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::security::create_pair_rejects_non_token_contract",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::security::initialize_cannot_be_replayed_to_change_setter",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::security::factory_activity_refreshes_instance_and_pair_hash_ttl",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::security::legacy_factory_uninitialized_state_demonstrates_first_caller_risk",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::security::pair_registry_is_order_independent_and_indexed",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::security::previous_setter_loses_rights_after_handover",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_factory",
+      "test": "test::security::set_fee_to_records_setter_authorization",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_library",
+      "test": "test::get::get_amount_in_insufficient_liquidity_0",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_library",
+      "test": "test::get::get_amount_in",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_library",
+      "test": "test::get::get_amount_in_insufficient_liquidity_1",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_library",
+      "test": "test::get::get_amount_in_insufficient_output_amount",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_library",
+      "test": "test::get::get_amount_in_largest_valid_output",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_library",
+      "test": "test::get::get_amount_in_output_equal_to_reserve",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_library",
+      "test": "test::get::get_amount_in_output_greater_than_reserve",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_library",
+      "test": "test::get::get_amount_out",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_library",
+      "test": "test::get::get_amount_out_insufficient_input_amount",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_library",
+      "test": "test::get::get_amount_out_insufficient_liquidity_0",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_library",
+      "test": "test::get::get_amount_out_insufficient_liquidity_1",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_library",
+      "test": "test::get::get_amounts_in_invalid_path",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_library",
+      "test": "test::get::get_amounts_in",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_library",
+      "test": "test::get::get_amounts_out",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_library",
+      "test": "test::get::get_amounts_out_invalid_path",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_library",
+      "test": "test::quote::quote",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_library",
+      "test": "test::get::get_reserves_with_pair",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_library",
+      "test": "test::quote::quote_insufficient_amount",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_library",
+      "test": "test::quote::quote_insufficient_liquidity_0",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_library",
+      "test": "test::quote::quote_insufficient_liquidity_1",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_library",
+      "test": "test::tokens::pair_for",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_library",
+      "test": "test::tokens::sort_tokens_correct_order",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_library",
+      "test": "test::tokens::sort_tokens_same_address",
+      "status": "PASS"
+    },
+    {
+      "suite": "amm_properties",
+      "test": "amount_in_rejects_draining_outputs",
+      "status": "PASS"
+    },
+    {
+      "suite": "amm_properties",
+      "test": "amount_in_round_trips",
+      "status": "PASS"
+    },
+    {
+      "suite": "amm_properties",
+      "test": "amount_out_is_monotonic",
+      "status": "PASS"
+    },
+    {
+      "suite": "amm_properties",
+      "test": "amount_out_is_strictly_less_than_reserve",
+      "status": "PASS"
+    },
+    {
+      "suite": "amm_properties",
+      "test": "amount_out_is_tight",
+      "status": "PASS"
+    },
+    {
+      "suite": "amm_properties",
+      "test": "amount_out_preserves_k",
+      "status": "PASS"
+    },
+    {
+      "suite": "amm_properties",
+      "test": "non_positive_inputs_are_rejected",
+      "status": "PASS"
+    },
+    {
+      "suite": "amm_properties",
+      "test": "quote_rounds_down",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::boundaries::additional_liquidity_that_rounds_to_zero_is_rejected",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::boundaries::additional_liquidity_rounds_down",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::boundaries::deposit_product_overflow_reverts_without_state_change",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::boundaries::first_deposit_at_minimum_liquidity_is_rejected",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::boundaries::first_deposit_uses_geometric_mean",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::boundaries::first_deposit_just_above_minimum_liquidity",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::boundaries::imbalanced_deposit_mints_by_the_smaller_side",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::boundaries::k_never_decreases_across_swaps",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::boundaries::lp_allowance_expiration_boundary_preserves_balances_on_failure",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::boundaries::minimum_liquidity_stays_locked_after_full_withdrawal",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::boundaries::swap_cannot_drain_a_reserve",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::boundaries::swap_output_boundary_matches_constant_product_formula",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::boundaries::swap_fee_rounds_up_so_dust_input_buys_nothing",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::boundaries::swap_to_a_pool_token_is_rejected",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::boundaries::sync_and_skim_reconcile_donations",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::boundaries::withdraw_rounds_down_in_favour_of_the_pool",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::boundaries::withdraw_without_sending_shares_is_rejected",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::deposit::deposit_basic",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::deposit::deposit_basic_2",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::deposit::deposit_not_yet_initialized",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::deposit::deposit_insufficient_first_liquidity",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::deposit::deposit_only_token_0_sent",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::deposit::deposit_sufficient_first_liquidity",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::deposit::deposit_zero_tokens_sent",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::events::deposit_event",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::events::swap_event",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::events::skim_event",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::events::withdraw_event",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::events::sync_event",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::fee::fee_off",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::fee::fee_on_add_swap_add",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::initialize::double_initialize",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::fee::fee_on_add_swap_remove",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::initialize::initialize_initial_values_0",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::initialize::initialize_token_1_less_than_token_0",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::skim::skim_nothing - should panic",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::skim::skim",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::skim::skim_with_liquidity_nothing_to_skim",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::soroswap_pair_token::test",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::soroswap_pair_token::test_zero_allowance",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::soroswap_pair_token::test_burn",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::soroswap_pair_token::transfer_from_insufficient_allowance - should panic",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::soroswap_pair_token::transfer_insufficient_balance - should panic",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::swap::swap_token_1",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::swap::swap_token_0",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::swap::try_swap_amount_1_negative",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::swap::try_swap_amount_0_negative",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::swap::try_swap_amounts_zero",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::swap::try_swap_no_liquidity",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::swap::try_swap_not_yet_initialized",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::swap::try_swap_to_token_0",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::swap::try_swap_to_token_1",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::swap::try_swap_token_0_insufficient_input",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::swap::try_swap_token_0_low_sent",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::swap::try_swap_token_1_insufficient_input",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::swap::try_swap_token_1_low_sent",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::swap::try_swap_token_1_optimal_plus_1",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::sync::sync",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::sync::sync_not_initialized - should panic",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::withdraw::try_withdraw_not_shares_sent",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::sync::sync_with_liquidity_nothing_to_sync",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::withdraw::try_withdraw_not_yet_initialized",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::withdraw::try_withdraw_not_yet_deposited",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_pair",
+      "test": "test::withdraw::withdraw",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::add_liquidity::amount_b_desired_higher",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::add_liquidity::amount_a_desired_higher",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::add_liquidity::insufficient_a_amount",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::add_liquidity::insufficient_b_amount",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::add_liquidity::test_add_liquidity_amount_a_desired_negative",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::add_liquidity::test_add_liquidity",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::add_liquidity::test_add_liquidity_amount_a_min_negative",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::add_liquidity::test_add_liquidity_amount_b_desired_negative",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::add_liquidity::test_add_liquidity_amount_b_min_negative",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::add_liquidity::test_add_liquidity_deadline_expired",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::add_liquidity::test_add_liquidity_not_authorized - should panic",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::add_liquidity::test_add_liquidity_deducted_amount_reserve",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::add_liquidity::test_add_liquidity_not_yet_initialized",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::budget::budget_add_liquidity",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::constructors::router_deployment_atomically_initializes_and_rejects_takeover",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::constructors::router_deployment_without_constructor_arguments_rolls_back",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::budget::budget_remove_liquidity_equal_amount_exact_minimum_out",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::events::initialized_event",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::events::add_liquidity_event",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::events::remove_liquidity_event",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::events::swap_exact_tokens_for_tokens_event",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::initialize::test_get_factory_not_yet_initialized",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::events::swap_tokens_for_exact_tokens_event",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::initialize::test_initialize_and_get_factory",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::initialize::test_initialize_twice",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::library_functions::test_get_amount_in",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::library_functions::test_get_amount_out",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::library_functions::test_get_amounts_in_not_yet_initialized",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::library_functions::test_get_amounts_in",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::library_functions::test_get_amounts_out",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::library_functions::test_get_amounts_out_not_yet_initialized",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::library_functions::test_quote",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::library_functions::test_quote_insufficient_amount",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::library_functions::test_quote_insufficient_liquidity_0",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::library_functions::test_quote_insufficient_liquidity_1",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::library_functions::try_router_get_amount_in_insufficient_liquidity_0",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::library_functions::try_router_get_amount_in_insufficient_liquidity_1",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::library_functions::try_router_get_amount_in_insufficient_output_amount",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::library_functions::try_router_get_amount_in_output_exceeds_reserve",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::library_functions::try_router_get_amount_out_insufficient_input_amount",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::library_functions::try_router_get_amount_out_insufficient_liquidity_0",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::library_functions::try_router_get_amount_out_insufficient_liquidity_1",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::library_functions::try_router_get_amounts_in_invalid_path",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::library_functions::try_router_get_amounts_out_invalid_path",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::remove_liquidity::test_remove_liquidity_amount_a_min_negative",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::remove_liquidity::test_remove_liquidity_deadline_expired",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::remove_liquidity::test_remove_liquidity_amount_b_min_negative",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::remove_liquidity::test_remove_liquidity_equal_amount_0_minimum_out",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::remove_liquidity::test_remove_liquidity_equal_amount_exact_minimum_out",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::remove_liquidity::test_remove_liquidity_inequal_amount_0_minimum_out",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::remove_liquidity::test_remove_liquidity_inequal_amount_exact_minimum_out",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::remove_liquidity::test_remove_liquidity_inequal_amount_exact_minimum_out_other_way",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::remove_liquidity::test_remove_liquidity_insufficient_a_amount",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::remove_liquidity::test_remove_liquidity_insufficient_sent_shares - should panic",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::remove_liquidity::test_remove_liquidity_insufficient_b_amount",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::remove_liquidity::test_remove_liquidity_not_authorized - should panic",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::remove_liquidity::test_remove_liquidity_liquidity_negative",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::remove_liquidity::test_remove_liquidity_not_yet_initialized",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::remove_liquidity::test_remove_liquidity_pair_does_not_exist",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::remove_liquidity::test_remove_liquidity_sufficient_amount",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::remove_liquidity::test_remove_liquidity_sufficient_amount_inverse",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::security::deadline_equal_to_ledger_timestamp_is_expired",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::security::failed_initial_deposit_rolls_back_pair_creation_and_token_transfers",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::security::initialize_cannot_be_replayed",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::security::failed_withdrawal_slippage_rolls_back_burn_transfers_and_reserves",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::security::legacy_router_uninitialized_state_demonstrates_first_caller_risk",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::security::liquidity_operations_require_signature_of_to",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::security::slippage_failure_moves_no_funds",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::security::swap_authorization_is_rooted_at_the_router_call",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::security::swap_requires_signature_of_to",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::swap_exact_tokens_for_tokens::swap_exact_tokens_for_tokens_2_hops",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::security::three_hop_swaps_match_quotes_and_leave_nothing_in_the_router",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::swap_exact_tokens_for_tokens::swap_exact_tokens_for_tokens_amount_out_min_negative",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::swap_exact_tokens_for_tokens::swap_exact_tokens_for_tokens_amount_in_negative",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::swap_exact_tokens_for_tokens::swap_exact_tokens_for_tokens_expired",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::swap_exact_tokens_for_tokens::swap_exact_tokens_for_tokens_enough_output_amount",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::swap_exact_tokens_for_tokens::swap_exact_tokens_for_tokens_insufficient_output_amount",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::swap_exact_tokens_for_tokens::swap_exact_tokens_for_tokens_not_initialized",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::swap_exact_tokens_for_tokens::try_swap_exact_tokens_for_tokens_invalid_path",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::swap_exact_tokens_for_tokens::try_swap_exact_tokens_for_tokens_insufficient_input_amount",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::swap_exact_tokens_for_tokens::try_swap_exact_tokens_for_tokens_pair_does_not_exist",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::swap_exact_tokens_for_tokens::try_swap_exact_tokens_for_tokens_repeated_token_in_path",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::swap_exact_tokens_for_tokens::try_swap_exact_tokens_for_tokens_second_hop_does_not_exist",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::swap_tokens_for_exact_tokens::swap_tokens_for_exact_tokens",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::swap_tokens_for_exact_tokens::swap_tokens_for_exact_tokens_2_hops",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::swap_tokens_for_exact_tokens::swap_tokens_for_exact_tokens_amount_in_max_negative",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::swap_tokens_for_exact_tokens::swap_tokens_for_exact_tokens_amount_in_max_not_enough_amount_in_should_minus_1",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::swap_tokens_for_exact_tokens::swap_tokens_for_exact_tokens_amount_in_max_not_enough",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::swap_tokens_for_exact_tokens::swap_tokens_for_exact_tokens_amount_out_negative",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::swap_tokens_for_exact_tokens::swap_tokens_for_exact_tokens_amount_in_should",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::swap_tokens_for_exact_tokens::swap_tokens_for_exact_tokens_expired",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::swap_tokens_for_exact_tokens::swap_tokens_for_exact_tokens_not_initialized",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::swap_tokens_for_exact_tokens::try_swap_tokens_for_exact_tokens_invalid_path",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::swap_tokens_for_exact_tokens::try_swap_tokens_for_exact_tokens_insufficient_output_amount",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::swap_tokens_for_exact_tokens::try_swap_tokens_for_exact_tokens_pair_does_not_exist",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::swap_tokens_for_exact_tokens::try_swap_tokens_for_exact_tokens_repeated_token_in_path",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_router",
+      "test": "test::swap_tokens_for_exact_tokens::try_swap_tokens_for_exact_tokens_second_hop_does_not_exist",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_test_token",
+      "test": "test::decimal_is_over_max - should panic",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_test_token",
+      "test": "test::initialize_already_initialized - should panic",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_test_token",
+      "test": "test::test_burn",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_test_token",
+      "test": "test::test",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_test_token",
+      "test": "test::test_zero_allowance",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_test_token",
+      "test": "test::transfer_from_insufficient_allowance - should panic",
+      "status": "PASS"
+    },
+    {
+      "suite": "veltrixae_test_token",
+      "test": "test::transfer_insufficient_balance - should panic",
+      "status": "PASS"
+    }
+  ]
+}

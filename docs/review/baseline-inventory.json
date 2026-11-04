@@ -1,0 +1,569 @@
+{
+  "baseline": "499fef4",
+  "files": {
+    ".github/ISSUE_TEMPLATE/bug_report.md": {
+      "bytes": 365,
+      "lines": 15
+    },
+    ".github/ISSUE_TEMPLATE/config.yml": {
+      "bytes": 220,
+      "lines": 5
+    },
+    ".github/dependabot.yml": {
+      "bytes": 2412,
+      "lines": 71
+    },
+    ".github/pull_request_template.md": {
+      "bytes": 495,
+      "lines": 13
+    },
+    ".github/workflows/ci.yml": {
+      "bytes": 1879,
+      "lines": 75
+    },
+    ".gitignore": {
+      "bytes": 392,
+      "lines": 25
+    },
+    "CHANGELOG.md": {
+      "bytes": 1748,
+      "lines": 36
+    },
+    "CONTRIBUTING.md": {
+      "bytes": 2087,
+      "lines": 53
+    },
+    "Cargo.lock": {
+      "bytes": 55117,
+      "lines": 2229
+    },
+    "Cargo.toml": {
+      "bytes": 940,
+      "lines": 38
+    },
+    "LICENSE": {
+      "bytes": 1066,
+      "lines": 21
+    },
+    "LICENSE-APACHE": {
+      "bytes": 11361,
+      "lines": 202
+    },
+    "Makefile": {
+      "bytes": 1415,
+      "lines": 52
+    },
+    "NOTICE": {
+      "bytes": 538,
+      "lines": 12
+    },
+    "README.md": {
+      "bytes": 4897,
+      "lines": 100
+    },
+    "SECURITY.md": {
+      "bytes": 5377,
+      "lines": 81
+    },
+    "bindings/README.md": {
+      "bytes": 1604,
+      "lines": 49
+    },
+    "bindings/factory/.gitignore": {
+      "bytes": 19,
+      "lines": 2
+    },
+    "bindings/factory/README.md": {
+      "bytes": 3068,
+      "lines": 54
+    },
+    "bindings/factory/package-lock.json": {
+      "bytes": 20571,
+      "lines": 591
+    },
+    "bindings/factory/package.json": {
+      "bytes": 321,
+      "lines": 17
+    },
+    "bindings/factory/src/index.ts": {
+      "bytes": 20222,
+      "lines": 341
+    },
+    "bindings/factory/tsconfig.json": {
+      "bytes": 11045,
+      "lines": 97
+    },
+    "bindings/pair/.gitignore": {
+      "bytes": 19,
+      "lines": 2
+    },
+    "bindings/pair/README.md": {
+      "bytes": 3050,
+      "lines": 54
+    },
+    "bindings/pair/package-lock.json": {
+      "bytes": 20565,
+      "lines": 591
+    },
+    "bindings/pair/package.json": {
+      "bytes": 318,
+      "lines": 17
+    },
+    "bindings/pair/src/index.ts": {
+      "bytes": 29310,
+      "lines": 460
+    },
+    "bindings/pair/tsconfig.json": {
+      "bytes": 11045,
+      "lines": 97
+    },
+    "bindings/router/.gitignore": {
+      "bytes": 19,
+      "lines": 2
+    },
+    "bindings/router/README.md": {
+      "bytes": 3062,
+      "lines": 54
+    },
+    "bindings/router/package-lock.json": {
+      "bytes": 20569,
+      "lines": 591
+    },
+    "bindings/router/package.json": {
+      "bytes": 320,
+      "lines": 17
+    },
+    "bindings/router/src/index.ts": {
+      "bytes": 34925,
+      "lines": 431
+    },
+    "bindings/router/tsconfig.json": {
+      "bytes": 11045,
+      "lines": 97
+    },
+    "contracts/factory-interface/Cargo.toml": {
+      "bytes": 345,
+      "lines": 13
+    },
+    "contracts/factory-interface/src/error.rs": {
+      "bytes": 682,
+      "lines": 23
+    },
+    "contracts/factory-interface/src/lib.rs": {
+      "bytes": 3084,
+      "lines": 82
+    },
+    "contracts/factory/Cargo.toml": {
+      "bytes": 481,
+      "lines": 19
+    },
+    "contracts/factory/src/event.rs": {
+      "bytes": 2337,
+      "lines": 90
+    },
+    "contracts/factory/src/lib.rs": {
+      "bytes": 9716,
+      "lines": 308
+    },
+    "contracts/factory/src/pair.rs": {
+      "bytes": 3115,
+      "lines": 85
+    },
+    "contracts/factory/src/storage.rs": {
+      "bytes": 5181,
+      "lines": 157
+    },
+    "contracts/factory/src/test.rs": {
+      "bytes": 3560,
+      "lines": 125
+    },
+    "contracts/factory/src/test/deterministic.rs": {
+      "bytes": 13663,
+      "lines": 442
+    },
+    "contracts/factory/src/test/events.rs": {
+      "bytes": 11801,
+      "lines": 395
+    },
+    "contracts/factory/src/test/fee_to_setter.rs": {
+      "bytes": 5513,
+      "lines": 174
+    },
+    "contracts/factory/src/test/initialize.rs": {
+      "bytes": 5570,
+      "lines": 184
+    },
+    "contracts/factory/src/test/pairs.rs": {
+      "bytes": 4260,
+      "lines": 136
+    },
+    "contracts/factory/src/test/security.rs": {
+      "bytes": 5595,
+      "lines": 166
+    },
+    "contracts/library/Cargo.toml": {
+      "bytes": 761,
+      "lines": 25
+    },
+    "contracts/library/README.md": {
+      "bytes": 1057,
+      "lines": 50
+    },
+    "contracts/library/src/error.rs": {
+      "bytes": 664,
+      "lines": 24
+    },
+    "contracts/library/src/lib.rs": {
+      "bytes": 13681,
+      "lines": 371
+    },
+    "contracts/library/src/math.rs": {
+      "bytes": 374,
+      "lines": 14
+    },
+    "contracts/library/src/quotes.rs": {
+      "bytes": 6301,
+      "lines": 194
+    },
+    "contracts/library/src/reserves.rs": {
+      "bytes": 2595,
+      "lines": 79
+    },
+    "contracts/library/src/test.rs": {
+      "bytes": 3650,
+      "lines": 121
+    },
+    "contracts/library/src/test/get.rs": {
+      "bytes": 8063,
+      "lines": 242
+    },
+    "contracts/library/src/test/quote.rs": {
+      "bytes": 937,
+      "lines": 30
+    },
+    "contracts/library/src/test/tokens.rs": {
+      "bytes": 1626,
+      "lines": 56
+    },
+    "contracts/library/src/tokens.rs": {
+      "bytes": 2591,
+      "lines": 75
+    },
+    "contracts/library/tests/amm_properties.rs": {
+      "bytes": 3846,
+      "lines": 104
+    },
+    "contracts/pair/Cargo.toml": {
+      "bytes": 519,
+      "lines": 20
+    },
+    "contracts/pair/README.md": {
+      "bytes": 198,
+      "lines": 2
+    },
+    "contracts/pair/src/balances.rs": {
+      "bytes": 959,
+      "lines": 26
+    },
+    "contracts/pair/src/error.rs": {
+      "bytes": 2049,
+      "lines": 47
+    },
+    "contracts/pair/src/event.rs": {
+      "bytes": 3087,
+      "lines": 136
+    },
+    "contracts/pair/src/lib.rs": {
+      "bytes": 18753,
+      "lines": 535
+    },
+    "contracts/pair/src/math.rs": {
+      "bytes": 374,
+      "lines": 14
+    },
+    "contracts/pair/src/soroswap_pair_token/allowance.rs": {
+      "bytes": 1865,
+      "lines": 65
+    },
+    "contracts/pair/src/soroswap_pair_token/balance.rs": {
+      "bytes": 1271,
+      "lines": 42
+    },
+    "contracts/pair/src/soroswap_pair_token/contract.rs": {
+      "bytes": 5171,
+      "lines": 168
+    },
+    "contracts/pair/src/soroswap_pair_token/metadata.rs": {
+      "bytes": 590,
+      "lines": 22
+    },
+    "contracts/pair/src/soroswap_pair_token/mod.rs": {
+      "bytes": 285,
+      "lines": 14
+    },
+    "contracts/pair/src/soroswap_pair_token/storage_types.rs": {
+      "bytes": 745,
+      "lines": 29
+    },
+    "contracts/pair/src/soroswap_pair_token/total_supply.rs": {
+      "bytes": 1016,
+      "lines": 32
+    },
+    "contracts/pair/src/storage.rs": {
+      "bytes": 2633,
+      "lines": 91
+    },
+    "contracts/pair/src/strings.rs": {
+      "bytes": 987,
+      "lines": 29
+    },
+    "contracts/pair/src/test.rs": {
+      "bytes": 3918,
+      "lines": 145
+    },
+    "contracts/pair/src/test/boundaries.rs": {
+      "bytes": 8771,
+      "lines": 260
+    },
+    "contracts/pair/src/test/create/mod.rs": {
+      "bytes": 447,
+      "lines": 16
+    },
+    "contracts/pair/src/test/deposit.rs": {
+      "bytes": 5519,
+      "lines": 174
+    },
+    "contracts/pair/src/test/events.rs": {
+      "bytes": 11750,
+      "lines": 395
+    },
+    "contracts/pair/src/test/fee.rs": {
+      "bytes": 14510,
+      "lines": 413
+    },
+    "contracts/pair/src/test/initialize.rs": {
+      "bytes": 2433,
+      "lines": 75
+    },
+    "contracts/pair/src/test/skim.rs": {
+      "bytes": 3991,
+      "lines": 118
+    },
+    "contracts/pair/src/test/soroswap_pair_token.rs": {
+      "bytes": 8035,
+      "lines": 252
+    },
+    "contracts/pair/src/test/swap.rs": {
+      "bytes": 10768,
+      "lines": 357
+    },
+    "contracts/pair/src/test/sync.rs": {
+      "bytes": 3975,
+      "lines": 124
+    },
+    "contracts/pair/src/test/withdraw.rs": {
+      "bytes": 2901,
+      "lines": 89
+    },
+    "contracts/router/Cargo.toml": {
+      "bytes": 640,
+      "lines": 21
+    },
+    "contracts/router/README.md": {
+      "bytes": 54,
+      "lines": 0
+    },
+    "contracts/router/src/error.rs": {
+      "bytes": 3888,
+      "lines": 108
+    },
+    "contracts/router/src/event.rs": {
+      "bytes": 3932,
+      "lines": 138
+    },
+    "contracts/router/src/factory.rs": {
+      "bytes": 207,
+      "lines": 3
+    },
+    "contracts/router/src/lib.rs": {
+      "bytes": 35976,
+      "lines": 888
+    },
+    "contracts/router/src/pair.rs": {
+      "bytes": 514,
+      "lines": 12
+    },
+    "contracts/router/src/storage.rs": {
+      "bytes": 794,
+      "lines": 30
+    },
+    "contracts/router/src/test.rs": {
+      "bytes": 4102,
+      "lines": 144
+    },
+    "contracts/router/src/test/add_liquidity.rs": {
+      "bytes": 24922,
+      "lines": 660
+    },
+    "contracts/router/src/test/budget.rs": {
+      "bytes": 3195,
+      "lines": 92
+    },
+    "contracts/router/src/test/events.rs": {
+      "bytes": 15016,
+      "lines": 475
+    },
+    "contracts/router/src/test/initialize.rs": {
+      "bytes": 965,
+      "lines": 32
+    },
+    "contracts/router/src/test/library_functions.rs": {
+      "bytes": 6174,
+      "lines": 214
+    },
+    "contracts/router/src/test/remove_liquidity.rs": {
+      "bytes": 30274,
+      "lines": 823
+    },
+    "contracts/router/src/test/security.rs": {
+      "bytes": 7361,
+      "lines": 240
+    },
+    "contracts/router/src/test/swap.rs": {
+      "bytes": 21033,
+      "lines": 571
+    },
+    "contracts/router/src/test/swap_exact_tokens_for_tokens.rs": {
+      "bytes": 11602,
+      "lines": 340
+    },
+    "contracts/router/src/test/swap_tokens_for_exact_tokens.rs": {
+      "bytes": 16266,
+      "lines": 495
+    },
+    "contracts/token/Cargo.toml": {
+      "bytes": 420,
+      "lines": 18
+    },
+    "contracts/token/src/admin.rs": {
+      "bytes": 437,
+      "lines": 18
+    },
+    "contracts/token/src/allowance.rs": {
+      "bytes": 1844,
+      "lines": 65
+    },
+    "contracts/token/src/balance.rs": {
+      "bytes": 1119,
+      "lines": 35
+    },
+    "contracts/token/src/contract.rs": {
+      "bytes": 5536,
+      "lines": 180
+    },
+    "contracts/token/src/lib.rs": {
+      "bytes": 147,
+      "lines": 11
+    },
+    "contracts/token/src/metadata.rs": {
+      "bytes": 590,
+      "lines": 22
+    },
+    "contracts/token/src/storage_types.rs": {
+      "bytes": 777,
+      "lines": 31
+    },
+    "contracts/token/src/test.rs": {
+      "bytes": 7851,
+      "lines": 271
+    },
+    "deployments/README.md": {
+      "bytes": 489,
+      "lines": 11
+    },
+    "docs/ARCHITECTURE.md": {
+      "bytes": 5590,
+      "lines": 105
+    },
+    "docs/CONTRACTS.md": {
+      "bytes": 8004,
+      "lines": 169
+    },
+    "docs/DEPLOYMENT.md": {
+      "bytes": 4008,
+      "lines": 112
+    },
+    "docs/TECHNICAL_AUDIT.md": {
+      "bytes": 8312,
+      "lines": 156
+    },
+    "docs/TESTING.md": {
+      "bytes": 3122,
+      "lines": 58
+    },
+    "docs/UPSTREAM_ATTRIBUTION.md": {
+      "bytes": 3382,
+      "lines": 76
+    },
+    "metadata/factory.json": {
+      "bytes": 14795,
+      "lines": 555
+    },
+    "metadata/index.json": {
+      "bytes": 1732,
+      "lines": 84
+    },
+    "metadata/pair.json": {
+      "bytes": 20486,
+      "lines": 809
+    },
+    "metadata/router.json": {
+      "bytes": 25993,
+      "lines": 851
+    },
+    "rust-toolchain.toml": {
+      "bytes": 94,
+      "lines": 4
+    },
+    "scripts/build.sh": {
+      "bytes": 904,
+      "lines": 28
+    },
+    "scripts/create-pool.sh": {
+      "bytes": 3432,
+      "lines": 72
+    },
+    "scripts/deploy-testnet.sh": {
+      "bytes": 5784,
+      "lines": 145
+    },
+    "scripts/export-metadata.sh": {
+      "bytes": 1899,
+      "lines": 35
+    },
+    "scripts/generate-bindings.sh": {
+      "bytes": 897,
+      "lines": 20
+    },
+    "scripts/lib.sh": {
+      "bytes": 1952,
+      "lines": 55
+    },
+    "scripts/verify-deployment.sh": {
+      "bytes": 2656,
+      "lines": 61
+    },
+    "tools/spec-tool/Cargo.lock": {
+      "bytes": 28557,
+      "lines": 1111
+    },
+    "tools/spec-tool/Cargo.toml": {
+      "bytes": 583,
+      "lines": 21
+    },
+    "tools/spec-tool/src/main.rs": {
+      "bytes": 2335,
+      "lines": 66
+    }
+  }
+}

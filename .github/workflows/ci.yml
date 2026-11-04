@@ -22,13 +22,20 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Install Rust (stable, wasm32v1-none)
-        uses: dtolnay/rust-toolchain@stable
+      - name: Install pinned Rust (wasm32v1-none)
+        uses: dtolnay/rust-toolchain@master
         with:
+          toolchain: 1.99.1
           targets: wasm32v1-none
           components: clippy, rustfmt
 
       - uses: Swatinem/rust-cache@v2
+
+      - name: Test deployment safety guards (offline)
+        run: python3 -m unittest discover -s scripts/tests -v
+
+      - name: Scan tracked files for credentials
+        run: python3 scripts/check-secrets.py
 
       - name: Check formatting
         run: cargo fmt --all -- --check
@@ -47,6 +54,20 @@ jobs:
         run: |
           ls -l target/wasm32v1-none/release/veltrixae_*.wasm
           sha256sum target/wasm32v1-none/release/veltrixae_*.wasm
+
+      - name: Verify generated clients and metadata against artifacts
+        run: |
+          make bindings metadata
+          git diff --exit-code -- bindings/ metadata/
+
+      - name: Verify deterministic clean rebuild
+        run: |
+          sha256sum target/wasm32v1-none/release/veltrixae_*.wasm > /tmp/wasm-before.sha256
+          cargo build --locked --target wasm32v1-none --release --target-dir "$RUNNER_TEMP/veltrixae-repro"
+          for artifact in target/wasm32v1-none/release/veltrixae_*.wasm; do
+            cmp "$artifact" "$RUNNER_TEMP/veltrixae-repro/wasm32v1-none/release/$(basename "$artifact")"
+          done
+          sha256sum --check /tmp/wasm-before.sha256
 
       - uses: actions/upload-artifact@v7
         with:
@@ -73,3 +94,19 @@ jobs:
           cache-dependency-path: bindings/${{ matrix.contract }}/package-lock.json
       - run: npm ci --no-audit --no-fund
       - run: npm run build
+      - run: npm audit --audit-level=high
+
+  dependencies:
+    name: Rust dependency advisories (both lockfiles)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: 1.99.1
+      - run: cargo install cargo-audit --version 0.22.2 --locked
+      - name: Audit contract workspace
+        run: cargo audit --file Cargo.lock
+      - name: Audit generator workspace even if contract audit failed
+        if: ${{ !cancelled() }}
+        run: cargo audit --file tools/spec-tool/Cargo.lock
