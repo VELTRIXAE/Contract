@@ -12,8 +12,18 @@ fn fee(amount_in: i128) -> i128 {
     (amount_in * 3 + 999) / 1000
 }
 
+fn property_config() -> ProptestConfig {
+    let mut config = ProptestConfig::default();
+    config.cases = config.cases.max(2_000);
+    // Filtered reserve/output combinations legitimately produce inputs outside
+    // the bounded domain. Scale that budget with accepted stress-test cases;
+    // never reduce the number of accepted cases or weaken an assertion.
+    config.max_global_rejects = config.max_global_rejects.max(config.cases);
+    config
+}
+
 proptest! {
-    #![proptest_config(ProptestConfig::with_cases(2_000))]
+    #![proptest_config(property_config())]
 
     /// The pool never pays out its whole reserve.
     #[test]
@@ -60,6 +70,25 @@ proptest! {
         prop_assert!(get_amount_out(amount_in, r_in, r_out).unwrap() >= out);
     }
 
+    /// Existing sufficient quotes retain their exact value; only underfunded
+    /// historical quotes may increase. The pool's integer-fee output is the oracle.
+    #[test]
+    fn sufficient_historical_exact_output_quotes_are_preserved(
+        r_in in 1..=MAX, r_out in 2..=MAX, out_frac in 1u32..=999_999
+    ) {
+        let out = (r_out - 1) * out_frac as i128 / 1_000_000;
+        prop_assume!(out > 0);
+        let n = r_in * out * 1000;
+        let d = (r_out - out) * 997;
+        let old = n / d + i128::from(n % d != 0) + 1;
+        prop_assume!(old <= MAX);
+        let current = get_amount_in(out, r_in, r_out).unwrap();
+        prop_assert!(current >= old);
+        if get_amount_out(old, r_in, r_out).unwrap() >= out {
+            prop_assert_eq!(current, old);
+        }
+    }
+
     /// get_amount_in never returns a negative or zero amount and rejects
     /// outputs that would empty the reserve.
     #[test]
@@ -101,4 +130,18 @@ proptest! {
         prop_assert_eq!(get_amount_in(x, r, r), Err(SoroswapLibraryError::InsufficientOutputAmount));
         prop_assert_eq!(quote(x, r, r), Err(SoroswapLibraryError::InsufficientAmount));
     }
+}
+
+#[test]
+fn exact_output_quote_covers_integer_fee_rounding_counterexample() {
+    let (r_in, r_out, out) = (
+        72_320_497_631_014_911,
+        94_716_774_993_543_284,
+        28_883_596_383_956_043,
+    );
+    let old = 31_825_313_508_430_334;
+    assert_eq!(get_amount_out(old, r_in, r_out), Ok(out - 1));
+    let corrected = get_amount_in(out, r_in, r_out).unwrap();
+    assert_eq!(corrected, old + 1);
+    assert_eq!(get_amount_out(corrected, r_in, r_out), Ok(out));
 }

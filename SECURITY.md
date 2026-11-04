@@ -27,6 +27,7 @@ failing test). We aim to acknowledge reports within 72 hours.
 | Area | Finding | Status |
 |---|---|---|
 | Quote math | `get_amount_in` with `amount_out >= reserve_out` divided by zero or returned a **negative** input amount (`router_get_amount_in`, `router_get_amounts_in`). Pair-level K check prevented fund loss. | **Fixed**, returns `LibraryInsufficientLiquidity` (511). Boundary and property tests added. |
+| Exact-output rounding | A pre-existing quote can be one input unit too low for the pair's rounded fee; the invariant rejects the swap atomically. | Draft correction retains sufficient historical quotes and increases only underfunded ones; deterministic/property/release-WASM tests added. Independent math review required before merge. |
 | Router routes | Swap through a hop with no registered pair trapped with an opaque host error. | **Fixed**: every hop is checked with `factory.pair_exists` before any transfer; returns `RouterPairDoesNotExist` (509). Repeated tokens return 515. |
 | Integer overflow | Release profile for pair and router had `overflow-checks` off (upstream). Code uses `checked_*` almost everywhere, but not in every path. | **Fixed**: one workspace release profile with `overflow-checks = true` for all contracts. |
 | Router WASM surface | Linking the library crate exported the stand-alone library contract's functions from the router WASM. | **Fixed**: library contract behind the opt-in `contract` feature. |
@@ -128,3 +129,6 @@ See [dependency investigation](docs/DEPENDENCY_SECURITY.md) and final
 
 Full advisory investigation: [DEPENDENCY_SECURITY.md](docs/DEPENDENCY_SECURITY.md).
 Licensing evidence: [LICENSING_REVIEW.md](docs/LICENSING_REVIEW.md).
+
+See [PR #9 remediation review](docs/review/PR9_REMEDIATION.md) for the exact-output
+rounding counterexample, preserved constructor authorization and final CI results.

@@ -94,3 +94,16 @@ storage in test-only fixtures to preserve their assertions about old invalid
 states. Those fixtures do not represent a reachable new on-chain deployment.
 Cross-contract integration fixtures now pass constructor arguments instead of
 performing a separate initialize call. Pair deployment and all math are unchanged.
+
+## PR #9 follow-up
+
+The [remediation report](review/PR9_REMEDIATION.md) records 269 passing Rust tests
+and 12 offline script tests. Two additional constructor regressions cover legacy
+creation; admin denial is checked on actual constructor-created WASM. A persisted
+property counterexample and deterministic/release-router-WASM tests cover
+exact-output integer fee rounding. The original round-trip assertion is retained.
+
+`PROPTEST_CASES=100000` is now honored, with a minimum of 2,000 accepted cases
+and a proportional budget for rejecting generated inputs outside the bounded
+arithmetic domain. CI runs the validated stress command separately; this does
+not lower accepted cases, hide a failing assertion or relax a security gate.

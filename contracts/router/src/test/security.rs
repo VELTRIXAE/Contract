@@ -339,3 +339,60 @@ fn legacy_router_uninitialized_state_demonstrates_first_caller_risk() {
     assert_eq!(test.contract.get_factory(), test.user);
     assert!(test.contract.try_initialize(&test.factory.address).is_err());
 }
+
+#[test]
+fn release_wasm_exact_output_swap_handles_integer_fee_rounding_counterexample() {
+    let test = SoroswapRouterTest::setup();
+    let wasm: &[u8] =
+        include_bytes!("../../../../target/wasm32v1-none/release/veltrixae_router.wasm");
+    // Use the actual release router WASM with its constructor, not the native
+    // fixture that synthesizes legacy uninitialized state.
+    let address = test.env.register(wasm, (test.factory.address.clone(),));
+    let router = crate::SoroswapRouterClient::new(&test.env, &address);
+    let (rin, rout, out, gross) = (
+        72_320_497_631_014_911,
+        94_716_774_993_543_284,
+        28_883_596_383_956_043,
+        31_825_313_508_430_335,
+    );
+    router.add_liquidity(
+        &test.token_0.address,
+        &test.token_1.address,
+        &rin,
+        &rout,
+        &0,
+        &0,
+        &test.user,
+        &1000,
+    );
+    let path = path2(&test);
+    let quoted = router.router_get_amounts_in(&out, &path);
+    assert_eq!(quoted.get(0), Some(gross));
+    let before = (
+        test.token_0.balance(&test.user),
+        test.token_1.balance(&test.user),
+    );
+    assert_eq!(
+        router.try_swap_tokens_for_exact_tokens(&out, &(gross - 1), &path, &test.user, &1000),
+        Err(Ok(CombinedRouterError::RouterExcessiveInputAmount))
+    );
+    assert_eq!(
+        (
+            test.token_0.balance(&test.user),
+            test.token_1.balance(&test.user)
+        ),
+        before
+    );
+    let amounts = router.swap_tokens_for_exact_tokens(&out, &gross, &path, &test.user, &1000);
+    assert_eq!(amounts, quoted);
+    assert_eq!(before.0 - test.token_0.balance(&test.user), gross);
+    assert_eq!(test.token_1.balance(&test.user) - before.1, out);
+    let pair_address = test
+        .factory
+        .get_pair(&test.token_0.address, &test.token_1.address);
+    let pair = crate::test::SoroswapPairClient::new(&test.env, &pair_address);
+    assert_eq!(pair.get_reserves(), (rin + gross, rout - out));
+    assert_eq!(test.token_0.balance(&pair_address), rin + gross);
+    assert_eq!(test.token_1.balance(&pair_address), rout - out);
+    assert!((rin + gross) * (rout - out) >= rin * rout);
+}

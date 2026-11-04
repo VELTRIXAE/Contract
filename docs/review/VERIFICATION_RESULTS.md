@@ -1,5 +1,8 @@
 # Final verification results
 
+Historical snapshot for PR #9 head `e4351d7`; follow-up findings and current
+verification are in [PR9_REMEDIATION.md](PR9_REMEDIATION.md).
+
 2026-11-04; baseline `499fef4`, branch `funding-readiness/contracts` with atomic
 factory/router constructors and the changes summarized in PR_SUMMARY.md.
 This is reproducible engineering evidence, not an independent security audit.

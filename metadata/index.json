@@ -59,7 +59,7 @@
     },
     "router": {
       "wasm": "veltrixae_router.wasm",
-      "wasm_sha256": "d50700763f4cd6e69ab58fb19b916ff73f00ed3909f00e63f9e5d1d59353cdea",
+      "wasm_sha256": "6be4a8d6c0b6c4cdd9abfc6732caee5be9bab3027ebaff8b53d3f7ef245ebce4",
       "spec": "router.json",
       "event_topics": [
         [
