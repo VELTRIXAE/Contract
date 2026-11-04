@@ -97,3 +97,13 @@ by publishing an unreviewed fork under a higher version number.
 PR #9 CI and the post-merge main run both failed the root audit with exit 1.
 The independent generator audit ran after that failure and passed. The two
 unmaintained warnings remain visible. No check or warning policy was relaxed.
+
+## PR #10 follow-up: upgrade paths tested
+
+Resolver runs in a throwaway copy show that SDK 25.3.0, 27.0.6, 29.0.1 and
+30.0.0-rc.1 all still select `crypto-bigint 0.5.5` through `elliptic-curve 0.13.8`.
+A patched RustCrypto stack now exists (`elliptic-curve 0.14.3` requires
+`crypto-bigint ^0.7.8`), but `soroban-env-host` 30.0.0 and the default branch of
+`stellar/rs-soroban-env` still declare the 0.13 line. The fix therefore has to land
+in the Stellar host. The advisory stays open and the gate stays enabled. See
+[the full review](review/PR10_LICENSING_SECURITY_REVIEW.md#7-rustsec-2026-0387-upgrade-investigation).
