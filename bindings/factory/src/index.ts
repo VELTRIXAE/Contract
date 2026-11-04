@@ -286,6 +286,8 @@ export interface Client {
 }
 export class Client extends ContractClient {
   static async deploy<T = Client>(
+        /** Constructor/Initialization Args for the contract's `__constructor` method */
+        {setter, pair_wasm_hash}: {setter: string, pair_wasm_hash: Buffer},
     /** Options for initializing a Client as well as for calling a method, with extras specific to deploying. */
     options: MethodOptions &
       Omit<ContractClientOptions, "contractId"> & {
@@ -297,7 +299,7 @@ export class Client extends ContractClient {
         format?: "hex" | "base64";
       }
   ): Promise<AssembledTransaction<T>> {
-    return ContractClient.deploy(null, options)
+    return ContractClient.deploy({setter, pair_wasm_hash}, options)
   }
   constructor(public readonly options: ContractClientOptions) {
     super(
@@ -310,6 +312,7 @@ export class Client extends ContractClient {
         "AAAAAAAAAS1DaGVja3MgaWYgYSBwYWlyIGV4aXN0cyBmb3IgdGhlIGdpdmVuIGB0b2tlbl9hYCBhbmQgYHRva2VuX2JgLgoKIyBBcmd1bWVudHMKCiogYGVgIC0gQW4gaW5zdGFuY2Ugb2YgdGhlIGBFbnZgIHN0cnVjdC4KKiBgdG9rZW5fYWAgLSBUaGUgYWRkcmVzcyBvZiB0aGUgZmlyc3QgdG9rZW4gaW4gdGhlIHBhaXIuCiogYHRva2VuX2JgIC0gVGhlIGFkZHJlc3Mgb2YgdGhlIHNlY29uZCB0b2tlbiBpbiB0aGUgcGFpci4KCiMgRXJyb3JzCgpSZXR1cm5zIGFuIGVycm9yIGlmIHRoZSBGYWN0b3J5IGlzIG5vdCB5ZXQgaW5pdGlhbGl6ZWQuAAAAAAAAC3BhaXJfZXhpc3RzAAAAAAIAAAAAAAAAB3Rva2VuX2EAAAAAEwAAAAAAAAAHdG9rZW5fYgAAAAATAAAAAQAAA+kAAAABAAAH0AAAAAxGYWN0b3J5RXJyb3I=",
         "AAAAAAAAAJVDaGVja3MgaWYgZmVlcyBhcmUgZW5hYmxlZC4KCiMgQXJndW1lbnRzCgoqIGBlYCAtIEFuIGluc3RhbmNlIG9mIHRoZSBgRW52YCBzdHJ1Y3QuCgojIEVycm9ycwoKUmV0dXJucyBhbiBlcnJvciBpZiB0aGUgRmFjdG9yeSBpcyBub3QgeWV0IGluaXRpYWxpemVkLgAAAAAAAAxmZWVzX2VuYWJsZWQAAAAAAAAAAQAAA+kAAAABAAAH0AAAAAxGYWN0b3J5RXJyb3I=",
         "AAAAAAAAALJSZXR1cm5zIHRoZSBhZGRyZXNzIGFsbG93ZWQgdG8gY2hhbmdlIHRoZSBmZWUgcmVjaXBpZW50LgoKIyBBcmd1bWVudHMKCiogYGVgIC0gQW4gaW5zdGFuY2Ugb2YgdGhlIGBFbnZgIHN0cnVjdC4KCiMgRXJyb3JzCgpSZXR1cm5zIGFuIGVycm9yIGlmIHRoZSBGYWN0b3J5IGlzIG5vdCB5ZXQgaW5pdGlhbGl6ZWQuAAAAAAANZmVlX3RvX3NldHRlcgAAAAAAAAAAAAABAAAD6QAAABMAAAfQAAAADEZhY3RvcnlFcnJvcg==",
+        "AAAAAAAAAAAAAAANX19jb25zdHJ1Y3RvcgAAAAAAAAIAAAAAAAAABnNldHRlcgAAAAAAEwAAAAAAAAAOcGFpcl93YXNtX2hhc2gAAAAAA+4AAAAgAAAAAA==",
         "AAAAAAAAAL9SZXR1cm5zIHRoZSB0b3RhbCBudW1iZXIgb2YgcGFpcnMgY3JlYXRlZCB0aHJvdWdoIHRoZSBmYWN0b3J5IHNvIGZhci4KCiMgQXJndW1lbnRzCgoqIGBlYCAtIEFuIGluc3RhbmNlIG9mIHRoZSBgRW52YCBzdHJ1Y3QuCgojIEVycm9ycwoKUmV0dXJucyBhbiBlcnJvciBpZiB0aGUgRmFjdG9yeSBpcyBub3QgeWV0IGluaXRpYWxpemVkLgAAAAAQYWxsX3BhaXJzX2xlbmd0aAAAAAAAAAABAAAD6QAAAAQAAAfQAAAADEZhY3RvcnlFcnJvcg==",
         "AAAAAAAAASRTZXRzIHdoZXRoZXIgZmVlcyBhcmUgZW5hYmxlZCBvciBkaXNhYmxlZC4KCiMgQXJndW1lbnRzCgoqIGBlYCAtIEFuIGluc3RhbmNlIG9mIHRoZSBgRW52YCBzdHJ1Y3QuCiogYGlzX2VuYWJsZWRgIC0gQSBib29sZWFuIGluZGljYXRpbmcgd2hldGhlciBmZWVzIGFyZSBlbmFibGVkIG9yIGRpc2FibGVkLgoKIyBFcnJvcnMKClJldHVybnMgYW4gZXJyb3IgaWYgdGhlIEZhY3RvcnkgaXMgbm90IHlldCBpbml0aWFsaXplZCBvciBpZiB0aGUgY2FsbGVyIGlzIG5vdCB0aGUgY3VycmVudCBgZmVlX3RvX3NldHRlcmAuAAAAEHNldF9mZWVzX2VuYWJsZWQAAAABAAAAAAAAAAppc19lbmFibGVkAAAAAAABAAAAAQAAA+kAAAPtAAAAAAAAB9AAAAAMRmFjdG9yeUVycm9y",
         "AAAAAAAAARBTZXRzIHRoZSBgZmVlX3RvX3NldHRlcmAgYWRkcmVzcy4KCiMgQXJndW1lbnRzCgoqIGBlYCAtIEFuIGluc3RhbmNlIG9mIHRoZSBgRW52YCBzdHJ1Y3QuCiogYG5ld19zZXR0ZXJgIC0gVGhlIGFkZHJlc3MgdG8gc2V0IGFzIHRoZSBuZXcgYGZlZV90b19zZXR0ZXJgLgoKIyBFcnJvcnMKClJldHVybnMgYW4gZXJyb3IgaWYgdGhlIEZhY3RvcnkgaXMgbm90IHlldCBpbml0aWFsaXplZCBvciBpZiB0aGUgY2FsbGVyIGlzIG5vdCB0aGUgZXhpc3RpbmcgYGZlZV90b19zZXR0ZXJgLgAAABFzZXRfZmVlX3RvX3NldHRlcgAAAAAAAAEAAAAAAAAACm5ld19zZXR0ZXIAAAAAABMAAAABAAAD6QAAA+0AAAAAAAAH0AAAAAxGYWN0b3J5RXJyb3I=",

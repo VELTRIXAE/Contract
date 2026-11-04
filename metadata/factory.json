@@ -1,6 +1,6 @@
 {
-  "wasm_sha256": "f633cde666930bb8c0b6fe4d06b15b483e51799d5c71ac8df0dc61050b1f9431",
-  "wasm_size_bytes": 11573,
+  "wasm_sha256": "f45c75d9623b77546004b39ffd3173e01811a2a3692091878409f40ee2ebe49b",
+  "wasm_size_bytes": 11854,
   "spec": [
     {
       "function_v0": {
@@ -239,6 +239,29 @@
             }
           }
         ]
+      }
+    },
+    {
+      "function_v0": {
+        "doc": "",
+        "name": "__constructor",
+        "inputs": [
+          {
+            "doc": "",
+            "name": "setter",
+            "type": "address"
+          },
+          {
+            "doc": "",
+            "name": "pair_wasm_hash",
+            "type": {
+              "bytes_n": {
+                "n": 32
+              }
+            }
+          }
+        ],
+        "outputs": []
       }
     },
     {

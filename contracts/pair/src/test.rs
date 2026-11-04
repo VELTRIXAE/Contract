@@ -43,9 +43,8 @@ fn create_factory_contract<'a>(
     setter: &Address,
     pair_wasm_hash: &BytesN<32>,
 ) -> SoroswapFactoryClient<'a> {
-    let factory_address = &e.register_contract_wasm(None, factory::WASM);
+    let factory_address = &e.register(factory::WASM, (setter.clone(), pair_wasm_hash.clone()));
     let factory = SoroswapFactoryClient::new(e, factory_address);
-    factory.initialize(&setter, pair_wasm_hash);
     factory
 }
 

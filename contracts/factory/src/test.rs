@@ -35,9 +35,20 @@ use pair::SoroswapPairClient;
 
 //  **** FACTORY CONTRACT (TO BE TESTED) ****
 fn create_factory_contract<'a>(e: &Env) -> SoroswapFactoryClient<'a> {
-    let factory =
-        SoroswapFactoryClient::new(e, &e.register_contract(None, crate::SoroswapFactory {}));
-    factory
+    let address = e.register(
+        crate::SoroswapFactory {},
+        (Address::generate(e), BytesN::from_array(e, &[0; 32])),
+    );
+    // Deliberately synthesize legacy uninitialized state for inherited negative
+    // tests. Real constructor-enabled deployments cannot reach this state.
+    e.as_contract(&address, || {
+        use crate::storage::DataKey;
+        for key in [DataKey::FeeTo, DataKey::FeeToSetter, DataKey::TotalPairs] {
+            e.storage().instance().remove(&key);
+        }
+        e.storage().persistent().remove(&DataKey::PairWasmHash);
+    });
+    SoroswapFactoryClient::new(e, &address)
 }
 
 // THE TEST
@@ -123,3 +134,5 @@ mod pairs;
 mod security;
 
 pub mod deterministic;
+
+mod constructors;

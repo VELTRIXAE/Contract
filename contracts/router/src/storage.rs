@@ -28,3 +28,9 @@ pub fn has_factory(e: &Env) -> bool {
 pub fn get_factory(e: &Env) -> Address {
     e.storage().instance().get(&DataKey::Factory).unwrap()
 }
+
+// Only inherited unit tests synthesize the old pre-initialization state.
+#[cfg(test)]
+pub(crate) fn reset_initialization_for_test(e: &Env) {
+    e.storage().instance().remove(&DataKey::Factory);
+}

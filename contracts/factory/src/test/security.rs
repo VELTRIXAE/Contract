@@ -164,3 +164,97 @@ fn pair_registry_is_order_independent_and_indexed() {
         Err(Ok(FactoryError::CreatePairAlreadyExists))
     );
 }
+
+#[test]
+fn legacy_factory_uninitialized_state_demonstrates_first_caller_risk() {
+    let test = SoroswapFactoryTest::setup();
+    test.env.set_auths(&[]);
+    // Deliberately reset legacy state remains vulnerable; production deployment
+    // now initializes atomically in the constructor (tested separately).
+    test.contract.initialize(&test.user, &test.pair_wasm);
+    assert_eq!(test.contract.fee_to_setter(), test.user);
+    assert_eq!(
+        test.contract.try_initialize(&test.admin, &test.pair_wasm),
+        Err(Ok(FactoryError::InitializeAlreadyInitialized))
+    );
+}
+
+#[test]
+fn factory_activity_refreshes_instance_and_pair_hash_ttl() {
+    use soroban_sdk::testutils::{
+        storage::{Instance, Persistent},
+        Ledger,
+    };
+    let test = SoroswapFactoryTest::setup();
+    test.contract.initialize(&test.admin, &test.pair_wasm);
+    // Initialize one pair before advancing ledgers so its shared uploaded code
+    // stays live. The factory hash VALUE TTL does not renew uploaded WASM TTL.
+    test.contract
+        .create_pair(&test.token_0.address, &test.token_1.address);
+    // Test-token initialize does not renew its instance TTL.
+    // Keep unrelated token instances/code alive while exercising factory TTL.
+    for token in [&test.token_2.address, &test.token_3.address] {
+        test.env
+            .deployer()
+            .extend_ttl(token.clone(), 3 * 17280, 3 * 17280);
+    }
+    let initial = test.env.as_contract(&test.contract.address, || {
+        (
+            test.env.storage().instance().get_ttl(),
+            test.env
+                .storage()
+                .persistent()
+                .get_ttl(&crate::storage::DataKey::PairWasmHash),
+        )
+    });
+    test.env
+        .ledger()
+        .with_mut(|l| l.sequence_number += 2 * 17280);
+    let aged = test.env.as_contract(&test.contract.address, || {
+        (
+            test.env.storage().instance().get_ttl(),
+            test.env
+                .storage()
+                .persistent()
+                .get_ttl(&crate::storage::DataKey::PairWasmHash),
+        )
+    });
+    assert!(aged.0 < initial.0 && aged.1 < initial.1);
+    test.contract
+        .create_pair(&test.token_2.address, &test.token_3.address);
+    let refreshed = test.env.as_contract(&test.contract.address, || {
+        (
+            test.env.storage().instance().get_ttl(),
+            test.env
+                .storage()
+                .persistent()
+                .get_ttl(&crate::storage::DataKey::PairWasmHash),
+        )
+    });
+    assert!(refreshed.0 > aged.0 && refreshed.1 > aged.1);
+    assert_eq!(test.contract.fee_to_setter(), test.admin);
+}
+
+#[test]
+fn archived_uploaded_pair_code_fails_without_registry_mutation() {
+    use soroban_sdk::testutils::Ledger;
+    let test = SoroswapFactoryTest::setup();
+    test.contract.initialize(&test.admin, &test.pair_wasm);
+    // No pair has initialized/extended the uploaded pair WASM. The fixture's
+    // default upload TTL expires before the factory's 30-day instance TTL.
+    test.env
+        .ledger()
+        .with_mut(|l| l.sequence_number += 2 * 17280);
+    // Archived-footprint access is a non-recoverable host error in SDK 22,
+    // so even try_create_pair panics rather than returning a contract error.
+    let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        test.contract
+            .try_create_pair(&test.token_0.address, &test.token_1.address)
+    }));
+    assert!(result.is_err());
+    assert_eq!(test.contract.all_pairs_length(), 0);
+    assert!(!test
+        .contract
+        .pair_exists(&test.token_0.address, &test.token_1.address));
+    assert_eq!(test.contract.fee_to_setter(), test.admin);
+}

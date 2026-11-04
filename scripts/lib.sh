@@ -53,3 +53,11 @@ deployment_file() { echo "$DEPLOYMENTS_DIR/$1.json"; }
 extract_tx_hash() {
   grep -Eo '\b[0-9a-f]{64}\b' "$1" | tail -n1 || true
 }
+
+# Public Testnet connection, independent of mutable CLI aliases.
+TESTNET_RPC_URL="https://soroban-testnet.stellar.org"
+TESTNET_PASSPHRASE="Test SDF Network ; September 2015"
+TESTNET_ARGS=(--rpc-url "$TESTNET_RPC_URL" --network-passphrase "$TESTNET_PASSPHRASE")
+require_public_testnet() {
+  [[ "$1" == testnet ]] || die "This operation supports public Testnet only."
+}

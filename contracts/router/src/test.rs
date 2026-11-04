@@ -39,15 +39,20 @@ use factory::SoroswapFactoryClient;
 
 fn create_soroswap_factory<'a>(e: &Env, setter: &Address) -> SoroswapFactoryClient<'a> {
     let pair_hash = pair_contract_wasm(&e);
-    let factory_address = &e.register_contract_wasm(None, factory::WASM);
+    let factory_address = &e.register(factory::WASM, (setter.clone(), pair_hash.clone()));
     let factory = SoroswapFactoryClient::new(e, factory_address);
-    factory.initialize(&setter, &pair_hash);
     factory
 }
 
 // SoroswapRouter Contract
 fn create_soroswap_router<'a>(e: &Env) -> SoroswapRouterClient<'a> {
-    SoroswapRouterClient::new(e, &e.register_contract(None, SoroswapRouter {}))
+    let address = e.register(SoroswapRouter {}, (Address::generate(e),));
+    // Preserve inherited pre-initialization/error tests. This storage reset is
+    // a native test fixture only, not a production method or deployment flow.
+    e.as_contract(&address, || {
+        crate::storage::reset_initialization_for_test(e)
+    });
+    SoroswapRouterClient::new(e, &address)
 }
 
 // SoroswapRouter TEST
@@ -142,3 +147,5 @@ pub mod swap_tokens_for_exact_tokens;
 
 // BUDGET TEST MOD
 mod budget;
+
+mod constructors;

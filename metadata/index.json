@@ -5,7 +5,7 @@
   "contracts": {
     "factory": {
       "wasm": "veltrixae_factory.wasm",
-      "wasm_sha256": "f633cde666930bb8c0b6fe4d06b15b483e51799d5c71ac8df0dc61050b1f9431",
+      "wasm_sha256": "f45c75d9623b77546004b39ffd3173e01811a2a3692091878409f40ee2ebe49b",
       "spec": "factory.json",
       "event_topics": [
         [
@@ -59,7 +59,7 @@
     },
     "router": {
       "wasm": "veltrixae_router.wasm",
-      "wasm_sha256": "9d733f8352a29d934578e718b7b48f0646c13e7c746e8aad8805f226dd05705c",
+      "wasm_sha256": "d50700763f4cd6e69ab58fb19b916ff73f00ed3909f00e63f9e5d1d59353cdea",
       "spec": "router.json",
       "event_topics": [
         [

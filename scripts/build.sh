@@ -8,7 +8,7 @@ source "$(dirname "$0")/lib.sh"
 
 cd "$ROOT_DIR"
 log "Building contracts (wasm32v1-none, release)"
-cargo build --target wasm32v1-none --release
+cargo build --locked --target wasm32v1-none --release
 
 if [[ "${1:-}" == "--no-opt" ]]; then exit 0; fi
 
