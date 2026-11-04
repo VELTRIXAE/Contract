@@ -30,6 +30,9 @@ elif 'fee_to_setter' in a:
  if os.environ.get('STATE_READ_FAILURE'): raise SystemExit(1)
  print(json.dumps(os.environ.get('ACTUAL_SETTER', 'GSETTER')))
 elif 'get_factory' in a: print(json.dumps('CFACTORY'))
+elif 'all_pairs_length' in a:
+ if os.environ.get('PAIR_COUNT_FAILURE'): raise SystemExit(1)
+ print(os.environ.get('PAIR_COUNT_OUTPUT', '0'))
 elif a[:2] == ['keys','address']: print('GSETTER')
 elif a[:2] == ['contract','upload']:
  print('0' * 64)
@@ -50,14 +53,26 @@ elif 'initialize' in a:
 else: raise SystemExit(1)
 ''')
         cli.chmod(0o755)
+        # Intercept all HTTP requests: these tests never use a public network.
+        curl = self.root / 'curl'
+        curl.write_text('''#!/usr/bin/env python3
+import json, sys
+url = next(arg for arg in sys.argv[1:] if arg.startswith('https://'))
+if url == 'https://soroban-testnet.stellar.org':
+ print(json.dumps({'result': {'passphrase': 'Test SDF Network ; September 2015'}}))
+else:
+ print(json.dumps({'hash': url.rsplit('/', 1)[-1], 'successful': True}))
+''')
+        curl.chmod(0o755)
         self.env = dict(os.environ, STELLAR=str(cli), CALLS=str(self.calls))
+        self.env['PATH'] = str(self.root) + os.pathsep + os.environ['PATH']
         self.manifest = self.root / 'deployments/testnet.json'
         digest = hashlib.sha256(b'code').hexdigest()
         self.manifest.write_text(json.dumps({
             'network': 'testnet', 'fee_to_setter': 'GSETTER',
-            'contracts': {'factory': {'id': 'CFACTORY', 'wasm_sha256': digest},
-                          'router': {'id': 'CROUTER', 'wasm_sha256': digest},
-                          'pair': {'wasm_hash': '0' * 64}}}))
+            'contracts': {'factory': {'id': 'CFACTORY', 'wasm_sha256': digest, 'deploy_tx': '1' * 64, 'initialize_tx': '1' * 64},
+                          'router': {'id': 'CROUTER', 'wasm_sha256': digest, 'deploy_tx': '2' * 64, 'initialize_tx': '2' * 64},
+                          'pair': {'wasm_hash': '0' * 64, 'upload_tx': '3' * 64}}}))
 
     def run_script(self, script, *args):
         return subprocess.run(['bash', str(self.root / 'scripts' / script), *args],
@@ -99,6 +114,26 @@ else: raise SystemExit(1)
                                  '--i-authorize-testnet-deploy')
         self.assertNotEqual(result.returncode, 0)
         self.assertIn('refusing redeployment', result.stderr)
+
+    def test_verifier_valid_record_is_read_only(self):
+        result = self.run_script('verify-deployment.sh')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('factory.all_pairs_length = 0', result.stdout)
+        self.assert_no_submission()
+
+    def test_verifier_unavailable_pair_count_fails(self):
+        self.env['PAIR_COUNT_FAILURE'] = '1'
+        result = self.run_script('verify-deployment.sh')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('factory.all_pairs_length unavailable', result.stdout)
+        self.assert_no_submission()
+
+    def test_verifier_malformed_pair_count_fails(self):
+        self.env['PAIR_COUNT_OUTPUT'] = 'not-a-count'
+        result = self.run_script('verify-deployment.sh')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('factory.all_pairs_length returned a malformed count', result.stdout)
+        self.assert_no_submission()
 
     def test_mainnet_rejected_before_cli(self):
         result = self.run_script('deploy-testnet.sh', '--source', 'name', '--network', 'mainnet')

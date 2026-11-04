@@ -99,3 +99,7 @@ a future authorized execution, not evidence of an executed deployment.
 
 Capture actual transaction receipts durably and re-run read-only verification.
 It has offline guard tests, but has not been exercised against live contracts.
+
+The verifier now treats an unavailable or malformed `all_pairs_length` response
+as FAIL. Offline HTTP/CLI fixtures verify this behavior; it does not establish
+project on-chain state. Project deployment evidence remains NOT VERIFIED.

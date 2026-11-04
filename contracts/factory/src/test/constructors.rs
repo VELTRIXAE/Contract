@@ -16,6 +16,15 @@ impl DeploymentHarness {
             .deploy_v2(code, (setter, pair))
     }
 
+    // Deliberately exercise the deprecated creation path: it must not bypass
+    // required constructors. No deprecated production API is introduced.
+    #[allow(deprecated)]
+    pub fn deploy_legacy(e: Env, code: BytesN<32>) -> Address {
+        e.deployer()
+            .with_current_contract(BytesN::from_array(&e, &[1; 32]))
+            .deploy(code)
+    }
+
     pub fn deploy_empty(e: Env, code: BytesN<32>) -> Address {
         e.deployer()
             .with_current_contract(BytesN::from_array(&e, &[1; 32]))
@@ -43,7 +52,13 @@ fn factory_deployment_atomically_initializes_and_rejects_takeover() {
         client.try_initialize(&attacker, &BytesN::from_array(&e, &[9; 32])),
         Err(Ok(FactoryError::InitializeAlreadyInitialized))
     );
+    // Initialization must preserve the original fee-setter authorization.
+    assert!(client.try_set_fee_to(&attacker).is_err());
+    assert!(client.try_set_fee_to_setter(&attacker).is_err());
+    assert!(client.try_set_fees_enabled(&true).is_err());
     assert_eq!(client.fee_to_setter(), setter);
+    assert_eq!(client.fee_to(), setter);
+    assert!(!client.fees_enabled());
     e.as_contract(&address, || {
         assert_eq!(crate::storage::get_pair_wasm_hash(&e).unwrap(), pair);
     });
@@ -61,6 +76,23 @@ fn factory_deployment_without_constructor_arguments_rolls_back() {
     assert!(harness.try_deploy_empty(&code).is_err());
     // Same deployer/salt must still be available after failure; no incomplete
     // instance can be claimed by calling initialize in a later transaction.
+    let address = harness.deploy(&code, &setter, &pair);
+    assert_eq!(
+        crate::SoroswapFactoryClient::new(&e, &address).fee_to_setter(),
+        setter
+    );
+}
+
+#[test]
+fn legacy_factory_deploy_cannot_bypass_constructor() {
+    let e = Env::default();
+    e.budget().reset_unlimited();
+    e.set_auths(&[]);
+    let code = e.deployer().upload_contract_wasm(FACTORY_WASM);
+    let setter = Address::generate(&e);
+    let pair = BytesN::from_array(&e, &[7; 32]);
+    let harness = DeploymentHarnessClient::new(&e, &e.register(DeploymentHarness, ()));
+    assert!(harness.try_deploy_legacy(&code).is_err());
     let address = harness.deploy(&code, &setter, &pair);
     assert_eq!(
         crate::SoroswapFactoryClient::new(&e, &address).fee_to_setter(),

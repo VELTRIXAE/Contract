@@ -31,8 +31,9 @@ UniswapV2 Solidity reference sources (GPL-3.0).
   `license = "GPL-3.0"` even though the repository license is Apache-2.0, and
   the router depended on `soroswap-library 0.3.0` from crates.io, which is
   published as GPL-3.0. VELTRIXAE no longer depends on the crates.io crate;
-  it links the in-repository library source. **Have the licensing of the
-  library crate confirmed by counsel before a commercial release.**
+  it links the in-repository library source. **Obtain rightsholder/legal clarification
+  of applicable licensing and distribution obligations before asserting a
+  compliant release.**
 
 ## Modifications (relative to the upstream commit)
 
@@ -50,31 +51,37 @@ Behaviour changes:
    retained. Constructor arguments are a deployment-interface change; existing
    immutable deployments are not migrated. See SECURITY.md and constructor tests.
 
+6. Exact-output input quotes account for the pair's integer-rounded fee. The
+   old continuous inverse plus one can underfund rare swaps by one input unit;
+   sufficient historical quotes retain their exact value. Pair invariant, fee
+   policy and LP formulas are unchanged. See `review/PR9_REMEDIATION.md` for
+   the counterexample, derivation, tests and required independent math review.
+
 Build and structure:
 
-6. Single cargo workspace, soroban-sdk 20.2 / 22-rc -> 22.0.11, target
+7. Single cargo workspace, soroban-sdk 20.2 / 22-rc -> 22.0.11, target
    `wasm32v1-none`, `overflow-checks = true` for every contract.
-7. Crates renamed `soroswap-*` -> `veltrixae-*` (test token
+8. Crates renamed `soroswap-*` -> `veltrixae-*` (test token
    `soroban-token-contract` -> `veltrixae-test-token`).
-8. Pair uses `soroban_sdk::token::TokenClient` instead of importing the
+9. Pair uses `soroban_sdk::token::TokenClient` instead of importing the
    test-token WASM.
-9. Factory, router and library use trait-defined clients instead of
+10. Factory, router and library use trait-defined clients instead of
    `contractimport!` of compiled WASM (and a committed binary).
-10. Library contract export gated behind the `contract` feature.
-11. Factory uses `deploy_v2` (same address derivation).
-12. Test-only contract methods moved into `#[cfg(test)]` impl blocks; two
+11. Library contract export gated behind the `contract` feature.
+12. Factory uses `deploy_v2` (same address derivation).
+13. Test-only contract methods moved into `#[cfg(test)]` impl blocks; two
     behaviour-preserving lint cleanups in pair storage.
 
 Tests:
 
-13. Upstream tests kept; wasm paths updated; two router event tests read
+14. Upstream tests kept; wasm paths updated; two router event tests read
     events before the next invocation (SDK 21+ semantics); the two
     `should_panic` pair-does-not-exist tests now assert error 509.
-14. New suites: factory security, pair boundaries, router security and path
+15. New suites: factory security, pair boundaries, router security and path
     validation, library property tests.
 
 Unchanged on purpose: existing callable function names and signatures, error enums and
-codes, event topics and payloads, storage keys, fee and liquidity math,
+codes, event topics and payloads, storage keys, pair fee policy and LP liquidity formulas,
 pair address derivation.
 
 Rust type names (`SoroswapFactory`, `SoroswapPairError`, ...) were kept so

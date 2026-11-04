@@ -66,3 +66,34 @@ uses a patched crypto-bigint release, then run the same RustSec gates and full
 contract/ABI/authorization/WASM checks. Obtain an upstream backport if keeping
 SDK 22 is required. Do not claim the advisory fixed based only on its absence
 from deployed WASM or on a newer direct dependency added alongside the old one.
+
+## PR #9 review: scope and remediation precision
+
+The full advisory also identifies early-return equality and conditional inversion
+behavior in newer types, alongside subtraction/zero-count/division/Montgomery
+operations. RustSec classifies the locked 0.5.5 as affected; not every named newer
+type necessarily exists in that older release. A per-operation applicability
+assessment is not a substitute for the advisory's affected-version result.
+
+`soroban-sdk 22.0.11` declares the host dependency under
+`cfg(not(target_family = "wasm"))`; WASM instead uses soroban-env-guest.
+The release-WASM normal dependency graph has neither soroban-env-host nor
+crypto-bigint. This establishes that this dependency's vulnerable Rust code is
+not bundled into the contract artifacts. It does not attest the version or
+security of a public validator's native host, wallets or other external tooling.
+The host/test chain includes ECDSA verification; this review has not demonstrated
+a secret-dependent exploit path in the AMM. Absence of demonstrated exploitation
+is not a justification to ignore the advisory.
+
+The inspected registry records for SDK 29.0.1 pin host 29.0.1, which still
+requires elliptic-curve ^0.13.5; elliptic-curve 0.13.8 requires crypto-bigint ^0.5.
+Thus a generic major SDK bump is **not an established fix**. Before proposing a
+migration, show a complete candidate lockfile with the old affected crate removed
+and a patched cryptography stack resolved. Alternatively obtain a reviewed
+compatible backport with matching advisory applicability metadata. The project
+must not claim resolution merely by adding crypto-bigint 0.7 alongside 0.5 or
+by publishing an unreviewed fork under a higher version number.
+
+PR #9 CI and the post-merge main run both failed the root audit with exit 1.
+The independent generator audit ran after that failure and passed. The two
+unmaintained warnings remain visible. No check or warning policy was relaxed.

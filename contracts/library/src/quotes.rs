@@ -95,21 +95,28 @@ pub fn get_amount_in(
     if amount_out >= reserve_out {
         return Err(SoroswapLibraryError::InsufficientLiquidity);
     }
-    let numerator = reserve_in
-        .checked_mul(amount_out)
-        .unwrap()
-        .checked_mul(1000)
-        .unwrap();
-    let denominator = reserve_out
-        .checked_sub(amount_out)
-        .unwrap()
-        .checked_mul(997)
-        .unwrap();
-    Ok(numerator
+    let product = reserve_in.checked_mul(amount_out).unwrap();
+    let remaining_out = reserve_out.checked_sub(amount_out).unwrap();
+    let numerator = product.checked_mul(1000).unwrap();
+    let denominator = remaining_out.checked_mul(997).unwrap();
+    let quoted = numerator
         .checked_ceiling_div(denominator)
         .unwrap()
         .checked_add(1)
-        .unwrap())
+        .unwrap();
+
+    // VELTRIXAE: the pair charges ceil(3 * input / 1000), leaving
+    // floor(997 * input / 1000) effective input. Inverting the continuous
+    // formula and adding one can still underfund a swap after this rounding.
+    // First round up the required effective input, then gross it up for fees.
+    // Keep the historical quote whenever it already suffices.
+    let required_effective_input = product.checked_ceiling_div(remaining_out).unwrap();
+    let fee_rounded_input = required_effective_input
+        .checked_mul(1000)
+        .unwrap()
+        .checked_ceiling_div(997)
+        .unwrap();
+    Ok(core::cmp::max(quoted, fee_rounded_input))
 }
 
 /// Performs chained getAmountOut calculations on any number of pairs.

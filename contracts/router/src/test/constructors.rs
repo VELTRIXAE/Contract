@@ -16,6 +16,15 @@ impl DeploymentHarness {
             .deploy_v2(code, (factory,))
     }
 
+    // Deliberately exercise the deprecated creation path: it must not bypass
+    // required constructors. No deprecated production API is introduced.
+    #[allow(deprecated)]
+    pub fn deploy_legacy(e: Env, code: BytesN<32>) -> Address {
+        e.deployer()
+            .with_current_contract(BytesN::from_array(&e, &[2; 32]))
+            .deploy(code)
+    }
+
     pub fn deploy_empty(e: Env, code: BytesN<32>) -> Address {
         e.deployer()
             .with_current_contract(BytesN::from_array(&e, &[2; 32]))
@@ -51,6 +60,22 @@ fn router_deployment_without_constructor_arguments_rolls_back() {
     let factory = Address::generate(&e);
     let harness = DeploymentHarnessClient::new(&e, &e.register(DeploymentHarness, ()));
     assert!(harness.try_deploy_empty(&code).is_err());
+    let address = harness.deploy(&code, &factory);
+    assert_eq!(
+        crate::SoroswapRouterClient::new(&e, &address).get_factory(),
+        factory
+    );
+}
+
+#[test]
+fn legacy_router_deploy_cannot_bypass_constructor() {
+    let e = Env::default();
+    e.budget().reset_unlimited();
+    e.set_auths(&[]);
+    let code = e.deployer().upload_contract_wasm(ROUTER_WASM);
+    let factory = Address::generate(&e);
+    let harness = DeploymentHarnessClient::new(&e, &e.register(DeploymentHarness, ()));
+    assert!(harness.try_deploy_legacy(&code).is_err());
     let address = harness.deploy(&code, &factory);
     assert_eq!(
         crate::SoroswapRouterClient::new(&e, &address).get_factory(),

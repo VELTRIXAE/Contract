@@ -47,6 +47,11 @@ jobs:
       - name: Run tests
         run: cargo test --locked
 
+      - name: Stress quote rounding and compatibility properties
+        env:
+          PROPTEST_CASES: "100000"
+        run: cargo test --locked -p veltrixae-library --test amm_properties
+
       - name: Clippy (correctness lints)
         run: cargo clippy --all-targets --locked -- -A clippy::all -D clippy::correctness
 

@@ -2,7 +2,7 @@
 
 All notable changes to this repository are recorded here. Format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); this project does
-not yet cut versioned releases (no contracts have been deployed — see
+not yet cut versioned releases (no verified deployment records are available — see
 `deployments/README.md`), so entries accumulate under **Unreleased** until
 a first testnet deployment is tagged.
 
@@ -15,6 +15,11 @@ a first testnet deployment is tagged.
   toolchain component) so formatting regressions fail the build.
 
 ### Fixed
+- Draft PR #9 follow-up: exact-output quotes now cover integer fee rounding
+  without lowering sufficient historical quotes. Includes a deterministic
+  counterexample, persisted property seed and release-WASM swap regression;
+  independent math review is required before merge.
+- Deployment verifier now fails unavailable or malformed factory pair counts.
 - Applied `cargo fmt --all` across every contract crate; the codebase had
   never been reformatted from its original upstream Soroswap style (693
   diff hunks, formatting only — no behavioral change, re-verified by a full

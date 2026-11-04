@@ -41,7 +41,15 @@ expected_setter="$(jq -r .fee_to_setter "$OUT")"
 [[ "$(view --id "$FACTORY_ID" -- fee_to_setter)" == "$expected_setter" ]] \
   && pass "factory.fee_to_setter == $expected_setter" || fail "factory.fee_to_setter mismatch"
 
-echo "  INFO all_pairs_length = $(view --id "$FACTORY_ID" -- all_pairs_length)"
+if pair_count="$(view --id "$FACTORY_ID" -- all_pairs_length)"; then
+  if [[ "$pair_count" =~ ^[0-9]+$ ]]; then
+    pass "factory.all_pairs_length = $pair_count"
+  else
+    fail "factory.all_pairs_length returned a malformed count"
+  fi
+else
+  fail "factory.all_pairs_length unavailable"
+fi
 
 tmpd="$(mktemp -d)"; trap 'rm -rf "$tmpd"' EXIT
 for c in factory router; do

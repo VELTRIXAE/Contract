@@ -42,6 +42,7 @@ existing typed errors. Identical tokens and invalid routes remain rejected.
 | Library export feature gate | `4e4ced3` | Avoid unintended library entry points in router WASM |
 | New boundary/property/auth/path tests | `2b5c64c`, `c8b09a1`, `2f753e8`, `d3fcee8` | Extend upstream regression coverage |
 | Rust formatting and warning cleanup | `5e3e2b8` and attribution list | Source normalization, no AMM redesign |
+| Exact-output rounding correction | PR #9 follow-up, library quotes | Covers integer fee rounding; retains sufficient historical input quotes; pair invariant/fee policy unchanged; independent review pending |
 | Current maintainer review | This branch | Locked build/toolchain, script guards, evidence, rollback/TTL tests and CI; atomic factory/router constructors; no AMM formula changes |
 
 ## SDK migration

@@ -14,7 +14,8 @@ and `veltrixae-test-token` (test-only token).
 
 > **Upstream.** These contracts are derived from
 > [Soroswap Core](https://github.com/soroswap/core) (Apache-2.0), commit
-> `6eade00`. The AMM math is unchanged. See
+> `6eade00`. The constant-product invariant, fee policy and LP accounting follow upstream;
+> exact-output quotes include a documented integer-rounding correction. See
 > [docs/UPSTREAM_ATTRIBUTION.md](docs/UPSTREAM_ATTRIBUTION.md) for every
 > modification.
 
@@ -98,6 +99,7 @@ Testnet contract state has not been verified; see
 - [docs/UPSTREAM_COMPARISON.md](docs/UPSTREAM_COMPARISON.md): exact upstream comparison and licensing limits
 - [docs/DEPENDENCY_SECURITY.md](docs/DEPENDENCY_SECURITY.md): unresolved RustSec advisory and dependency constraints
 - [docs/LICENSING_REVIEW.md](docs/LICENSING_REVIEW.md): preserved licenses and unresolved upstream conflict
+- [docs/review/PR9_REMEDIATION.md](docs/review/PR9_REMEDIATION.md): PR #9 findings, verified fixes and remaining approvals
 - [docs/review/BASELINE_AUDIT.md](docs/review/BASELINE_AUDIT.md): maintainer review baseline
 - [SECURITY.md](SECURITY.md): threat model, known limitations, reporting
 - [CONTRIBUTING.md](CONTRIBUTING.md): development workflow
@@ -105,7 +107,8 @@ Testnet contract state has not been verified; see
 
 ## License
 
-VELTRIXAE-authored code is under the [MIT License](LICENSE). Code derived from
-Soroswap Core remains under the [Apache License 2.0](LICENSE-APACHE); see
-[NOTICE](NOTICE). The crate manifests declare `Apache-2.0`, the license of the
-derived contract code.
+VELTRIXAE-only additions use the [MIT License](LICENSE) where applicable.
+Derived contract manifests declare [Apache License 2.0](LICENSE-APACHE) and
+retain [NOTICE](NOTICE). The library also retains explicit GPL-3.0 notices;
+its applicable licensing remains [unresolved](docs/LICENSING_REVIEW.md).
+These declarations do not establish an unambiguous grant for that library.

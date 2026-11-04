@@ -52,6 +52,11 @@ token, every hop is a factory-registered pair; slippage bound.
 | `router_get_amounts_out` | `amount_in, path` | amounts along `path` |
 | `router_get_amounts_in` | `amount_out, path` | amounts along `path` |
 
+Exact-output input quotes round required effective input before grossing up for
+the pair's integer-rounded fee. Sufficient historical quotes retain their value;
+underfunded quotes can increase. Pair fee policy/invariant and this interface
+are unchanged. See [the counterexample and proof](review/PR9_REMEDIATION.md).
+
 ### Errors (`CombinedRouterError`)
 
 | Code | Name | Meaning |
