@@ -117,3 +117,11 @@ Current library direct declarations resolve to soroban-sdk 22.0.11 (declared
 Apache-2.0) and num-integer 0.1.47 (MIT OR Apache-2.0). The dev-only proptest
 1.11.0 declares MIT OR Apache-2.0. These dependency declarations do not resolve
 the imported library's own README/manifest conflict or waive its notices.
+
+## File-by-file matrix and wider scope (PR #10 follow-up)
+
+[PR10_LICENSING_SECURITY_REVIEW.md](review/PR10_LICENSING_SECURITY_REVIEW.md) has the
+per-file provenance and remediation matrix. It also adds a question this inventory
+did not cover: the absence of a library dependency edge does not address the GPL-3.0
+Uniswap V2 lineage of the router, pair and factory, which should also go to counsel.
+No properly licensed upstream version or drop-in permissive replacement was found.

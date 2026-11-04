@@ -15,10 +15,10 @@ a first testnet deployment is tagged.
   toolchain component) so formatting regressions fail the build.
 
 ### Fixed
-- Draft PR #9 follow-up: exact-output quotes now cover integer fee rounding
-  without lowering sufficient historical quotes. Includes a deterministic
-  counterexample, persisted property seed and release-WASM swap regression;
-  independent math review is required before merge.
+- PR #10: exact-output quotes now cover integer fee rounding without lowering
+  sufficient historical quotes. Includes a deterministic counterexample,
+  persisted property seed and release-WASM swap regression. Merged 2026-11-04
+  with no recorded independent math review; that review is still required.
 - Deployment verifier now fails unavailable or malformed factory pair counts.
 - Applied `cargo fmt --all` across every contract crate; the codebase had
   never been reformatted from its original upstream Soroswap style (693
