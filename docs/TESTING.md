@@ -12,7 +12,8 @@ tests stale WASM; `make test` always rebuilds first. CI does the same.
 ## Suites
 
 Counts are from the last local run (`make test`, Rust 1.99, soroban-sdk
-22.0.11): **253 tests, all passing**.
+22.0.11): **253 tests, all passing** at the historical baseline. See
+[review evidence](review/VERIFICATION_RESULTS.md) for the current run and added regressions.
 
 | Crate | Tests | What they cover |
 |---|---:|---|
@@ -56,3 +57,40 @@ PROPTEST_CASES=100000 cargo test -p veltrixae-library --test amm_properties
   exercised; run `scripts/verify-deployment.sh` after a testnet deploy.
 - Fee-on-transfer and rebasing tokens are unsupported and untested (see
   SECURITY.md).
+
+## Maintainer review additions
+
+`contracts/router/src/test/security.rs` now checks rollback after nested LP burn
+and underlying-token transfers when withdrawal slippage fails, and rollback of
+pair deployment/registry/transfers after an initial deposit fails. Factory/router
+first-caller initialization tests explicitly demonstrate the documented risk;
+they describe legacy/test-reset state; production constructor deployment is
+covered separately below. Factory TTL renewal
+is tested after advancing ledger sequence; archived uploaded-code failure leaves
+the registry unchanged. LP allowance validity is checked at its expiration ledger
+and rejection one ledger later preserves balances, reserves and supply. Existing overflow, invalid pair,
+authorization, deadline and reserve-invariant tests remain intact.
+
+Run offline transaction-script guards with:
+
+```bash
+python3 -m unittest discover -s scripts/tests -v
+```
+
+The fake CLI never contacts a network or signs; passing guards do not establish
+live Stellar CLI compatibility. Signed nonce replay and network restore coverage
+remain scoped contributor follow-ups.
+
+## Constructor security regressions
+
+Factory/router constructor tests deploy actual compiled release WASM through a
+native deployment harness's `deploy_v2`, with no mocked authorization. They
+verify correct initial configuration, rejected takeover via initialize, and
+rollback of missing-argument creation followed by successful deployment with
+the same salt. Four tests supplement the 260-test earlier review baseline.
+
+Inherited native pre-initialization tests deliberately clear constructor-created
+storage in test-only fixtures to preserve their assertions about old invalid
+states. Those fixtures do not represent a reachable new on-chain deployment.
+Cross-contract integration fixtures now pass constructor arguments instead of
+performing a separate initialize call. Pair deployment and all math are unchanged.

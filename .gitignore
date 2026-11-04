@@ -23,3 +23,18 @@
 # Bindings build output (sources are committed, build artefacts are not)
 bindings/**/node_modules/
 bindings/**/dist/
+
+# Local agent/cloud credentials and signing material
+.aws/
+.agents/
+.codex/
+*.pem
+*.p12
+*.keystore
+
+# Python script test cache
+__pycache__/
+*.pyc
+
+# Local verification/debug output (curated results live in docs/review/)
+*.log

@@ -14,7 +14,7 @@ all: test
 
 ## Compile every contract to WASM (wasm32v1-none, release profile).
 build:
-	cargo build --target wasm32v1-none --release
+	cargo build --locked --target wasm32v1-none --release
 
 ## Shrink the deployable WASM with `stellar contract optimize`.
 optimize: build
@@ -25,11 +25,11 @@ optimize: build
 
 ## Build the WASM, then run all unit, integration and property tests.
 test: build
-	cargo test
+	cargo test --locked
 
 ## Run tests without rebuilding the WASM (only if the WASM is current).
 test-only:
-	cargo test
+	cargo test --locked
 
 fmt:
 	cargo fmt --all
@@ -38,7 +38,7 @@ fmt-check:
 	cargo fmt --all -- --check
 
 lint:
-	cargo clippy --all-targets -- -A clippy::all -D clippy::correctness
+	cargo clippy --locked --all-targets -- -A clippy::all -D clippy::correctness
 
 ## Generate TypeScript bindings for the frontend and aggregator.
 bindings: build

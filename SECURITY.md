@@ -38,15 +38,16 @@ failing test). We aim to acknowledge reports within 72 hours.
 
 ## Known limitations and risks (accepted, documented)
 
-1. **Unauthenticated `initialize` (factory and router).** The first caller
-   sets the factory's fee setter and pair WASM hash, or the router's factory.
-   On Soroban, deploy and initialize are separate transactions, so someone
-   can initialize a freshly deployed contract first. Mitigation:
-   `scripts/deploy-testnet.sh` verifies state immediately after each
-   `initialize` and aborts before anything is funded; if the check fails,
-   discard the contract and redeploy. A future version could move this into
-   a constructor (`__constructor`, soroban-sdk >= 22), which changes the
-   deployment interface.
+1. **Legacy initialization race; constructor fix for new artifacts.** Factory
+   and router now require constructor arguments and initialize in the deployment
+   transaction. `initialize` retains its signature and one-time guard, so later
+   takeover attempts fail. Compiled-WASM `deploy_v2` tests cover missing arguments,
+   rollback and takeover without mocked authorization. This changes the
+   deployment interface, not the AMM formulas. No existing immutable contract is
+   retroactively fixed. Legacy unauthenticated initialization remains unsafe;
+   never infer safety from a post-initialization read. Pair creation already
+   deploys and initializes atomically inside factory.create_pair; standalone
+   pair deployments are not the supported user flow.
 2. **Pair methods are permissionless and balance-based.** `deposit`, `swap`,
    `withdraw` and `skim` act on `balance - reserve`. Tokens sent to a pair
    outside an atomic router call can be claimed by anyone. Always use the
@@ -68,8 +69,8 @@ failing test). We aim to acknowledge reports within 72 hours.
    fee growth to `fee_to`. Use a multisig or governed account for this role.
 8. **No pause / emergency stop.** By design there is no admin who can freeze
    pools or move user funds.
-9. **SDK 22.** soroban-sdk 22 is still patched (22.0.11) but newer majors
-   exist. Upgrading changes the host interface and must be done deliberately
+9. **SDK 22.** soroban-sdk 22.0.11 is pinned; its host/testing graph has
+   the unresolved advisory documented below. Newer SDK majors exist. Upgrading changes the host interface and must be done deliberately
    with a full test run (Dependabot groups SDK updates for this reason).
 
 ## Secrets
@@ -79,3 +80,51 @@ failing test). We aim to acknowledge reports within 72 hours.
 - Scripts take a **Stellar CLI keystore name** (`stellar keys generate`),
   never a raw secret, and refuse arguments that look like secret keys.
 - Scripts refuse mainnet unconditionally.
+
+## Maintainer verification (2026-11-04)
+
+See [baseline review](docs/review/BASELINE_AUDIT.md) and
+[Testnet evidence](docs/TESTNET_VERIFICATION.md). This remains an internal
+review; no independent audit or verified project deployment is implied.
+Public RPC network identity was checked, but no contract IDs/receipts were
+available. The constructor fix covers newly deployed artifacts; legacy deployment safety
+and the upstream library licensing conflict still require maintainer review.
+
+Transaction scripts now pin the public Testnet RPC URL and passphrase rather
+than trusting local CLI aliases. Getter calls explicitly use `--send=no`;
+simulation does not persist TTL extensions. Existing deployment records cannot
+be overwritten by the deploy script. Remediation handles existing recorded
+instances only and requires explicit interactive approval before submissions. Constructor manifests never attempt initialization recovery.
+Offline tests verify guards; the remediation flow has not run against live
+contracts. Signature nonce replay enforcement belongs to the host and has not
+been proved by this repository's mocked authorization tests.
+
+Uploaded pair WASM has its own TTL. Factory activity refreshes the stored hash
+value, not necessarily that uploaded code. Before the first pool (or when all
+code users are inactive), archived pair code can block new pair creation even
+with a live factory. A regression test verifies failure leaves the registry
+unchanged. Operators must inspect/restore/extend code with separately approved
+transactions; this review does not perform them.
+
+## Open dependency advisory: RUSTSEC-2026-0387
+
+The 2026-11-04 cargo-audit 0.22.2 run fails for `crypto-bigint 0.5.5`:
+[upstream advisory](https://rustsec.org/advisories/RUSTSEC-2026-0387.html).
+The advisory describes timing-dependent behavior in intended constant-time
+integer operations; practical impact depends on downstream secret arithmetic
+and side-channel access. Do not interpret this as demonstrated AMM fund loss.
+
+`cargo tree --locked -i crypto-bigint` traces it through `elliptic-curve 0.13.8`
+and `soroban-env-host 22.1.3` in the host/testing SDK graph. The normal
+`wasm32v1-none` graph has no such dependency. The advisory requires >=0.7.6,
+while elliptic-curve requires 0.5; there is no compatible lockfile-only update.
+A reviewed SDK/host migration or upstream compatible backport is required.
+No ignored advisory, local cryptography patch or unsupported major override was
+added. CI deliberately remains failing until this is resolved. The generator
+lockfile passes; npm reports zero vulnerabilities for all three bindings.
+`derivative` and `paste` also produce unmaintained dependency warnings.
+See [dependency investigation](docs/DEPENDENCY_SECURITY.md) and final
+[verification results](docs/review/VERIFICATION_RESULTS.md).
+
+Full advisory investigation: [DEPENDENCY_SECURITY.md](docs/DEPENDENCY_SECURITY.md).
+Licensing evidence: [LICENSING_REVIEW.md](docs/LICENSING_REVIEW.md).

@@ -9,17 +9,28 @@ contract errors with the numeric codes below. Error type names and event
 topics keep their upstream `Soroswap*` names on purpose, so existing decoders
 and indexers keep working.
 
+## Deployment initialization
+
+New factory artifacts require `__constructor(setter: Address, pair_wasm_hash:
+BytesN<32>)`; new router artifacts require `__constructor(factory: Address)`.
+Soroban invokes these atomically during creation, before another transaction can
+call the instance. Missing arguments fail creation. Deployers must use
+CreateContractV2/`deploy_v2` or the CLI constructor arguments after `--`.
+The compatibility `initialize` methods are already consumed on new deployments.
+Existing immutable deployments retain their previous behavior. Pair deployment
+is unchanged: the factory creates and initializes it in one invocation.
+
 ---
 
 ## VELTRIXAE Router
 
 **Integrators should only call the router.**
 
-### State-changing methods (require `to` signature)
+### State-changing methods (liquidity/swaps require `to` signature)
 
 | Method | Arguments | Returns | Notes |
 |---|---|---|---|
-| `initialize` | `factory: Address` | `()` | One-time. Unauthenticated (see SECURITY.md). |
+| `initialize` | `factory: Address` | `()` | Compatibility entry point; rejects replay after constructor deployment. |
 | `add_liquidity` | `token_a, token_b: Address`, `amount_a_desired, amount_b_desired, amount_a_min, amount_b_min: i128`, `to: Address`, `deadline: u64` | `(amount_a, amount_b, liquidity)` | Creates the pair if missing. Pulls tokens from `to`, mints LP to `to`. |
 | `remove_liquidity` | `token_a, token_b: Address`, `liquidity, amount_a_min, amount_b_min: i128`, `to: Address`, `deadline: u64` | `(amount_a, amount_b)` | Burns `liquidity` LP from `to`. |
 | `swap_exact_tokens_for_tokens` | `amount_in, amount_out_min: i128`, `path: Vec<Address>`, `to: Address`, `deadline: u64` | `Vec<i128>` amounts per hop | Exact input, minimum output. Multi-hop via `path`. |

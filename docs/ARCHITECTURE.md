@@ -25,7 +25,8 @@ Soroswap Core. Three deployed contracts and two Rust libraries:
 ## Contracts
 
 ### Factory (`contracts/factory`)
-- `initialize(setter, pair_wasm_hash)` once. Stores the fee setter, sets
+- Factory `__constructor(setter, pair_wasm_hash)` initializes atomically during
+  deployment. The retained `initialize` method rejects later replay. Stores the fee setter, sets
   `fee_to = setter`, stores the pair WASM hash.
 - `create_pair(token_a, token_b)` sorts the tokens, deploys a pair with
   `deployer().with_current_contract(salt).deploy_v2(pair_wasm_hash, ())`
@@ -103,3 +104,7 @@ contract's compiled WASM at build time (clients are defined from traits), so
 `cargo build --target wasm32v1-none --release` builds everything in one pass.
 Test suites do import the compiled WASM, which is why `make test` builds
 first.
+
+Factory/router constructors remove the separate initialization transaction for
+new deployments. Pair creation remains deploy + initialize in one factory call;
+the AMM reserve and liquidity behavior is unchanged.

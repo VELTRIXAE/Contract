@@ -28,6 +28,15 @@ impl From<PairError> for FactoryError {
 #[contract]
 struct SoroswapFactory;
 
+// Initialization is part of contract creation, so no externally visible
+// uninitialized factory exists between deployment and initialization.
+#[contractimpl]
+impl SoroswapFactory {
+    pub fn __constructor(e: Env, setter: Address, pair_wasm_hash: BytesN<32>) {
+        <Self as SoroswapFactoryTrait>::initialize(e, setter, pair_wasm_hash).unwrap();
+    }
+}
+
 #[contractimpl]
 impl SoroswapFactoryTrait for SoroswapFactory {
     /* *** Read-only functions: *** */

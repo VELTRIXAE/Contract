@@ -64,10 +64,9 @@ impl<'a> SoroswapFactoryTest<'a> {
         //
         // let factory_address = &env.register_contract_wasm(None, factory::WASM);
         //
-        let factory_address = &env.register_contract(None, SoroswapFactory);
         let pair_hash = env.deployer().upload_contract_wasm(pair::WASM);
+        let factory_address = &env.register(SoroswapFactory, (alice.clone(), pair_hash.clone()));
         let factory = SoroswapFactoryClient::new(&env, &factory_address);
-        factory.initialize(&alice, &pair_hash);
         factory.create_pair(&token_0.address, &token_1.address);
         let pair_address = factory.get_pair(&token_0.address, &token_1.address);
         let pair = SoroswapPairClient::new(&env, &pair_address);

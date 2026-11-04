@@ -32,7 +32,7 @@ done
 if [[ -n "$AMOUNT_A$AMOUNT_B" ]]; then
   [[ "$AMOUNT_A" =~ ^[1-9][0-9]*$ && "$AMOUNT_B" =~ ^[1-9][0-9]*$ ]] || die "Amounts must be positive integers (smallest units)."
 fi
-check_network "$NETWORK"; require_stellar; require_jq; check_identity "$SOURCE"
+require_public_testnet "$NETWORK"; require_stellar; require_jq; check_identity "$SOURCE"
 
 OUT="$(deployment_file "$NETWORK")"
 [[ -f "$OUT" ]] || die "$OUT not found. Deploy first with ./scripts/deploy-testnet.sh"
@@ -48,7 +48,7 @@ if [[ $AUTHORIZED -ne 1 ]]; then
   [[ "$answer" == "CREATE POOL" ]] || die "Not authorized. Nothing was submitted."
 fi
 
-inv() { "$STELLAR" contract invoke --source "$SOURCE" --network "$NETWORK" "$@" 2> >(tee -a "$LOG" >&2); }
+inv() { "$STELLAR" contract invoke --source "$SOURCE" "${TESTNET_ARGS[@]}" "$@" 2> >(tee -a "$LOG" >&2); }
 
 if [[ -z "$AMOUNT_A" ]]; then
   PAIR_ID="$(inv --id "$FACTORY_ID" -- create_pair --token_a "$TOKEN_A" --token_b "$TOKEN_B" | tr -d '"')"
@@ -59,12 +59,12 @@ else
     --amount_a_desired "$AMOUNT_A" --amount_b_desired "$AMOUNT_B" \
     --amount_a_min "$AMOUNT_A" --amount_b_min "$AMOUNT_B" \
     --to "$SOURCE_ADDR" --deadline "$DEADLINE" >/dev/null
-  PAIR_ID="$(inv --id "$FACTORY_ID" -- get_pair --token_a "$TOKEN_A" --token_b "$TOKEN_B" | tr -d '"')"
+  PAIR_ID="$(inv --send=no --id "$FACTORY_ID" -- get_pair --token_a "$TOKEN_A" --token_b "$TOKEN_B" | tr -d '"')"
 fi
 TX="$(extract_tx_hash "$LOG")"
 [[ "$PAIR_ID" =~ ^C[A-Z2-7]{55}$ ]] || die "Unexpected pair id: $PAIR_ID"
 
-RESERVES="$(inv --id "$PAIR_ID" -- get_reserves)"
+RESERVES="$(inv --send=no --id "$PAIR_ID" -- get_reserves)"
 tmp="$(mktemp)"
 jq --arg pair "$PAIR_ID" --arg a "$TOKEN_A" --arg b "$TOKEN_B" --arg tx "$TX" \
    --arg at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \

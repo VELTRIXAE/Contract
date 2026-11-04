@@ -5,8 +5,8 @@
 source "$(dirname "$0")/lib.sh"
 cd "$ROOT_DIR"
 
-[[ "${1:-}" == "--no-build" ]] || cargo build --target wasm32v1-none --release
-cargo build --quiet --manifest-path tools/spec-tool/Cargo.toml
+[[ "${1:-}" == "--no-build" ]] || cargo build --locked --target wasm32v1-none --release
+cargo build --locked --quiet --manifest-path tools/spec-tool/Cargo.toml
 TOOL="tools/spec-tool/target/debug/veltrixae-spec-tool"
 mkdir -p metadata
 

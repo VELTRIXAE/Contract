@@ -44,9 +44,8 @@ fn create_token_contract<'a>(e: &Env, admin: &Address) -> TokenClient<'a> {
 
 fn create_soroswap_factory<'a>(e: &Env, setter: &Address) -> SoroswapFactoryClient<'a> {
     let pair_hash = pair_contract_wasm(&e);
-    let factory_address = &e.register(factory::WASM, ());
+    let factory_address = &e.register(factory::WASM, (setter.clone(), pair_hash.clone()));
     let factory = SoroswapFactoryClient::new(e, factory_address);
-    factory.initialize(&setter, &pair_hash);
     factory
 }
 

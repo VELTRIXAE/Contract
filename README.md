@@ -25,7 +25,7 @@ and `veltrixae-test-token` (test-only token).
 
 ## Quick start
 
-Requirements: Rust stable (installed automatically from `rust-toolchain.toml`,
+Requirements: Rust 1.99.1 (installed automatically from `rust-toolchain.toml`,
 including the `wasm32v1-none` target), `make`. Optional: the
 [Stellar CLI](https://developers.stellar.org/docs/tools/cli) for optimization
 and deployment, Node.js for building the bindings, `jq` for the scripts.
@@ -66,7 +66,11 @@ on `deposit`, `swap` and `withdraw` and expects tokens to have been
 transferred to it in the same transaction. The full public interface,
 errors and events are in [docs/CONTRACTS.md](docs/CONTRACTS.md).
 
-Compatibility: function names, argument types, error codes and event topics
+New factory/router deployments initialize atomically in constructors; see
+[deployment arguments](docs/CONTRACTS.md#deployment-initialization). Existing
+immutable deployments retain their original behavior.
+
+Compatibility: existing callable function names, argument types, error codes and event topics
 are identical to Soroswap Core, so existing Soroswap-compatible frontends,
 aggregators and indexers work against VELTRIXAE deployments by swapping
 contract IDs.
@@ -78,7 +82,9 @@ submits transactions requires an explicit confirmation, refuses mainnet, and
 reads keys only from the Stellar CLI keystore. See
 [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
-No VELTRIXAE contracts have been deployed from this repository yet.
+No deployment IDs or receipts are recorded in this repository. Project
+Testnet contract state has not been verified; see
+[docs/TESTNET_VERIFICATION.md](docs/TESTNET_VERIFICATION.md).
 
 ## Documentation
 
@@ -88,6 +94,11 @@ No VELTRIXAE contracts have been deployed from this repository yet.
 - [docs/TESTING.md](docs/TESTING.md): test suites and how to run them
 - [docs/UPSTREAM_ATTRIBUTION.md](docs/UPSTREAM_ATTRIBUTION.md): what came from Soroswap and what changed
 - [docs/TECHNICAL_AUDIT.md](docs/TECHNICAL_AUDIT.md): verified build/test status and audit findings
+- [docs/TESTNET_VERIFICATION.md](docs/TESTNET_VERIFICATION.md): read-only evidence and verification blockers
+- [docs/UPSTREAM_COMPARISON.md](docs/UPSTREAM_COMPARISON.md): exact upstream comparison and licensing limits
+- [docs/DEPENDENCY_SECURITY.md](docs/DEPENDENCY_SECURITY.md): unresolved RustSec advisory and dependency constraints
+- [docs/LICENSING_REVIEW.md](docs/LICENSING_REVIEW.md): preserved licenses and unresolved upstream conflict
+- [docs/review/BASELINE_AUDIT.md](docs/review/BASELINE_AUDIT.md): maintainer review baseline
 - [SECURITY.md](SECURITY.md): threat model, known limitations, reporting
 - [CONTRIBUTING.md](CONTRIBUTING.md): development workflow
 - [CHANGELOG.md](CHANGELOG.md): notable changes

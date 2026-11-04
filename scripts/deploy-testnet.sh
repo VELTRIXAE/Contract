@@ -16,10 +16,8 @@
 #   4. deploy + initialize the router, then verify get_factory
 #   5. write contract IDs, WASM hashes and tx hashes to deployments/<network>.json
 #
-# Initialization is unauthenticated (upstream design), so the script verifies
-# state immediately after each initialize call and aborts if another account
-# initialized the contract first. Nothing is funded before verification, so a
-# front-run only costs a redeploy.
+# Constructors initialize factory/router in their deployment transactions.
+# There is no separate uninitialized interval or initialize transaction.
 source "$(dirname "$0")/lib.sh"
 
 NETWORK="testnet"
@@ -39,7 +37,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 [[ -n "$SOURCE" ]] || die "--source <identity> is required (a name from 'stellar keys ls')."
-check_network "$NETWORK"
+require_public_testnet "$NETWORK"
 require_stellar
 require_jq
 check_identity "$SOURCE"
@@ -47,6 +45,7 @@ check_identity "$SOURCE"
 SOURCE_ADDR="$("$STELLAR" keys address "$SOURCE")"
 FEE_SETTER="${FEE_SETTER:-$SOURCE_ADDR}"
 OUT="$(deployment_file "$NETWORK")"
+[[ ! -e "$OUT" ]] || die "Existing record $OUT: verify or remediate it; refusing redeployment."
 LOG_DIR="$(mktemp -d)"
 trap 'rm -rf "$LOG_DIR"' EXIT
 
@@ -80,7 +79,12 @@ ROUTER_WASM="$(pick_wasm veltrixae_router)"
 
 run() { # run <logname> <stellar args...>  -> stdout of the command; log kept for tx hash
   local name="$1"; shift
-  "$STELLAR" "$@" --source "$SOURCE" --network "$NETWORK" 2> >(tee "$LOG_DIR/$name.log" >&2)
+  local command="$1" subcommand="$2"; shift 2
+  # CLI options must precede the contract method separator (--).
+  local status=0
+  "$STELLAR" "$command" "$subcommand" --source "$SOURCE" "${TESTNET_ARGS[@]}" "$@" 2> "$LOG_DIR/$name.log" || status=$?
+  cat "$LOG_DIR/$name.log" >&2
+  return "$status"
 }
 
 log "Uploading pair WASM"
@@ -89,29 +93,25 @@ PAIR_UPLOAD_TX="$(extract_tx_hash "$LOG_DIR/upload_pair.log")"
 [[ "$PAIR_HASH" =~ ^[0-9a-f]{64}$ ]] || die "Unexpected pair WASM hash: $PAIR_HASH"
 
 log "Deploying factory"
-FACTORY_ID="$(run deploy_factory contract deploy --wasm "$FACTORY_WASM" | tail -n1)"
+FACTORY_ID="$(run deploy_factory contract deploy --wasm "$FACTORY_WASM" -- --setter "$FEE_SETTER" --pair_wasm_hash "$PAIR_HASH" | tail -n1)"
 FACTORY_DEPLOY_TX="$(extract_tx_hash "$LOG_DIR/deploy_factory.log")"
 
-log "Initializing factory"
-run init_factory contract invoke --id "$FACTORY_ID" -- initialize \
-  --setter "$FEE_SETTER" --pair_wasm_hash "$PAIR_HASH" >/dev/null
-FACTORY_INIT_TX="$(extract_tx_hash "$LOG_DIR/init_factory.log")"
+# Constructor initialization and deployment have the same actual receipt.
+FACTORY_INIT_TX="$FACTORY_DEPLOY_TX"
 
-ACTUAL_SETTER="$(run verify_factory contract invoke --id "$FACTORY_ID" -- fee_to_setter | tr -d '"')"
+ACTUAL_SETTER="$(run verify_factory contract invoke --send=no --id "$FACTORY_ID" -- fee_to_setter | tr -d '"')"
 [[ "$ACTUAL_SETTER" == "$FEE_SETTER" ]] \
-  || die "Factory fee_to_setter is '$ACTUAL_SETTER', expected '$FEE_SETTER'. Possible front-run; discard $FACTORY_ID and redeploy."
+  || die "Factory fee_to_setter is '$ACTUAL_SETTER', expected '$FEE_SETTER'. Refusing to proceed; investigate code, arguments and receipt."
 
 log "Deploying router"
-ROUTER_ID="$(run deploy_router contract deploy --wasm "$ROUTER_WASM" | tail -n1)"
+ROUTER_ID="$(run deploy_router contract deploy --wasm "$ROUTER_WASM" -- --factory "$FACTORY_ID" | tail -n1)"
 ROUTER_DEPLOY_TX="$(extract_tx_hash "$LOG_DIR/deploy_router.log")"
 
-log "Initializing router"
-run init_router contract invoke --id "$ROUTER_ID" -- initialize --factory "$FACTORY_ID" >/dev/null
-ROUTER_INIT_TX="$(extract_tx_hash "$LOG_DIR/init_router.log")"
+ROUTER_INIT_TX="$ROUTER_DEPLOY_TX"
 
-ACTUAL_FACTORY="$(run verify_router contract invoke --id "$ROUTER_ID" -- get_factory | tr -d '"')"
+ACTUAL_FACTORY="$(run verify_router contract invoke --send=no --id "$ROUTER_ID" -- get_factory | tr -d '"')"
 [[ "$ACTUAL_FACTORY" == "$FACTORY_ID" ]] \
-  || die "Router factory is '$ACTUAL_FACTORY', expected '$FACTORY_ID'. Possible front-run; discard $ROUTER_ID and redeploy."
+  || die "Router factory is '$ACTUAL_FACTORY', expected '$FACTORY_ID'. Refusing to proceed; investigate code, arguments and receipt."
 
 mkdir -p "$DEPLOYMENTS_DIR"
 sha() { sha256sum "$1" | cut -d' ' -f1; }
@@ -128,6 +128,7 @@ jq -n \
   --arg factory_deploy_tx "$FACTORY_DEPLOY_TX" --arg factory_init_tx "$FACTORY_INIT_TX" \
   --arg router_deploy_tx "$ROUTER_DEPLOY_TX" --arg router_init_tx "$ROUTER_INIT_TX" \
   '{
+    deployment_model: "atomic-constructor-v1",
     network: $network, deployed_at: $deployed_at, git_commit: $commit,
     deployer: $deployer, fee_to_setter: $fee_setter,
     contracts: {

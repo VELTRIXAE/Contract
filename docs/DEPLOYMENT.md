@@ -3,12 +3,14 @@
 > Deployment is **never automatic**. Every script that submits transactions
 > asks for an explicit confirmation phrase (or the
 > `--i-authorize-testnet-deploy` flag), refuses mainnet unconditionally, and
-> uses keys only from the Stellar CLI keystore.
+> uses keys only from the Stellar CLI keystore. Public Testnet RPC and passphrase
+> are explicit; local aliases cannot redirect these scripts.
 
 > **Not yet exercised against the network.** The scripts were written for
 > Stellar CLI v28 and their argument handling and safety guards were tested
-> locally, but no deployment has been run from this repository yet. Do a dry
-> first run on testnet and check `deployments/testnet.json` by hand.
+> locally. No verified deployment IDs or receipts are available. Recover any
+> existing public records before considering a newly approved deployment; see
+> [TESTNET_VERIFICATION.md](TESTNET_VERIFICATION.md).
 
 ## Prerequisites
 
@@ -40,18 +42,20 @@ make test                 # builds WASM and runs all tests
 # optional: --fee-setter <G... of a multisig>   (defaults to the deployer)
 ```
 
-The script:
+The script (not executed during this review):
 
 1. prints the plan and waits for you to type `DEPLOY TO TESTNET`
 2. uploads the pair WASM (`stellar contract upload`) and keeps its hash
-3. deploys the factory, calls `initialize(setter, pair_wasm_hash)`, then reads
-   `fee_to_setter` back and **aborts if it does not match** (front-run check)
-4. deploys the router, calls `initialize(factory)`, reads `get_factory` back
-   and aborts on mismatch
+3. deploys the factory with constructor arguments `-- --setter ...
+   --pair_wasm_hash ...`; initialization is atomic in that transaction, then
+   verifies `fee_to_setter` using simulation
+4. deploys the router with constructor argument `-- --factory ...`, then
+   verifies `get_factory` using simulation
 5. writes `deployments/testnet.json` with the real contract IDs, WASM
    hashes, and the transaction hashes reported by the CLI
 
-Non-interactive use (CI, scripted demos) requires the explicit flag:
+Explicitly approved, manually initiated non-interactive use requires the flag
+below. Do not deploy from CI:
 
 ```bash
 ./scripts/deploy-testnet.sh --source veltrixae-deployer --i-authorize-testnet-deploy
@@ -101,8 +105,7 @@ Read-only (simulation only, submits nothing). Checks:
 ## After a deployment: record keeping
 
 Only values returned by the network belong in `deployments/*.json`. Do not
-hand-edit IDs or hashes. If a deployment is abandoned (e.g. failed front-run
-check), note it in the pull request but do not record the abandoned IDs as
+hand-edit IDs or hashes. If a deployment is abandoned (e.g. state mismatch), note it in the pull request but do not record the abandoned IDs as
 live.
 
 ## Mainnet
@@ -110,3 +113,22 @@ live.
 Out of scope. The scripts refuse `mainnet`/`public` network names. A mainnet
 launch needs an independent audit, a multisig `fee_to_setter`, and a
 separate, reviewed procedure.
+
+## Resume incomplete initialization
+
+Use `scripts/remediate-testnet.sh` to verify code/state and print a simulation-only
+plan for recovered existing contracts. It never deploys replacements. A missing
+manifest is a blocker, not authorization to redeploy. Review the plan and obtain
+human approval before the explicit `--apply --source KEYSTORE_NAME` mode, which
+also requires an interactive confirmation phrase. Record resulting public
+receipts and run the read-only verifier. Legacy artifacts still have the original
+initialization race; a conflicting initialized contract is refused. New manifests
+use `deployment_model: atomic-constructor-v1`; deployment and initialization
+share the same actual receipt. New constructor manifests never attempt recovery
+by calling initialize after an unreadable state check. Missing constructor
+arguments fail creation, rather than leaving an uninitialized instance.
+
+Constructor support is a deployment-interface change. Use a CLI that supports
+constructor arguments after `--`; the [v28 deploy source](https://github.com/stellar/stellar-cli/blob/v28.0.0/cmd/soroban-cli/src/commands/contract/deploy/wasm.rs) documents that parsing.
+This review exercised production WASM through SDK 22 `deploy_v2`, but no live CLI
+transaction was executed. No approval to deploy is implied by these instructions.

@@ -441,6 +441,15 @@ pub trait SoroswapRouterTrait {
 #[contract]
 struct SoroswapRouter;
 
+// Bind the factory atomically during deployment; initialize remains available
+// for ABI compatibility but rejects replay on every constructor-created router.
+#[contractimpl]
+impl SoroswapRouter {
+    pub fn __constructor(e: Env, factory: Address) {
+        <Self as SoroswapRouterTrait>::initialize(e, factory).unwrap();
+    }
+}
+
 #[contractimpl]
 impl SoroswapRouterTrait for SoroswapRouter {
     /// Initializes the contract and sets the factory address

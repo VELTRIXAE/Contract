@@ -258,3 +258,39 @@ fn sync_and_skim_reconcile_donations() {
     test.contract.sync();
     assert_eq!(test.contract.get_reserves(), (1_000_010, 1_000_020));
 }
+
+#[test]
+fn lp_allowance_expiration_boundary_preserves_balances_on_failure() {
+    use soroban_sdk::testutils::Ledger;
+    let test = SoroswapPairTest::setup();
+    init(&test);
+    add_liquidity(&test, &1_000_000, &1_000_000);
+    let expiration = test.env.ledger().sequence() + 1;
+    test.contract
+        .approve(&test.user, &test.admin, &100, &expiration);
+    test.env
+        .ledger()
+        .with_mut(|l| l.sequence_number = expiration);
+    assert_eq!(test.contract.allowance(&test.user, &test.admin), 100);
+    test.env.ledger().with_mut(|l| l.sequence_number += 1);
+    assert_eq!(test.contract.allowance(&test.user, &test.admin), 0);
+    let before = (
+        test.contract.balance(&test.user),
+        test.contract.balance(&test.admin),
+    );
+    let reserves = test.contract.get_reserves();
+    let supply = test.contract.total_supply();
+    assert!(test
+        .contract
+        .try_transfer_from(&test.admin, &test.user, &test.admin, &1)
+        .is_err());
+    assert_eq!(
+        (
+            test.contract.balance(&test.user),
+            test.contract.balance(&test.admin)
+        ),
+        before
+    );
+    assert_eq!(test.contract.get_reserves(), reserves);
+    assert_eq!(test.contract.total_supply(), supply);
+}
