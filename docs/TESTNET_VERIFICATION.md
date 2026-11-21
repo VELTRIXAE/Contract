@@ -1,5 +1,89 @@
 # Public Testnet verification
 
+## Reconciliation of backend-reported 2026-11-02 deployment
+
+The Contract README records no deployment IDs. The backend reports a November 2
+Factory/Router deployment. This section reconciles those receipts against public
+Testnet evidence. It is distinct from #13 (durable partial receipts): #13 covers
+persisting incomplete receipt data, while this section covers whether the
+reported deployment can be verified at all.
+
+**Manifest status: NOT PUBLISHED.** No `deployments/testnet.json` is published
+unless every check below passes against live public Testnet. Mocked, fixture or
+offline evidence is not success and must not be recorded as verification.
+
+### Reproducible read-only steps
+
+These steps require no key, funded account or write. `FACTORY_ID` and
+`ROUTER_ID` are the IDs reported by the backend; `SOURCE_REV` is the reported
+source revision.
+
+```bash
+FACTORY_ID=CCBE2WCHO5PY6WVXTKZLIZA446M43RTOVD4S6XZYHPHJEL7K33LHW6RA
+ROUTER_ID=CDSNTA4DH5CXDJJMY4QQ6IUF2M3VLR2WVPCL3UUQMCVUDQ5ZHVYWUZA4
+SOURCE_REV=133b18d00505108c26382cb44045abab48b51882
+
+# 1. Confirm public Testnet identity.
+curl --fail --silent --show-error https://horizon-testnet.stellar.org/ \
+  | jq '{network_passphrase, history_latest_ledger, history_latest_ledger_closed_at}'
+curl --fail --silent --show-error https://soroban-testnet.stellar.org/ \
+  -H 'Content-Type: application/json' \
+  --data '{"jsonrpc":"2.0","id":1,"method":"getNetwork"}' | jq .
+
+# 2. Fetch each contract's WASM and hash it.
+for ID in "$FACTORY_ID" "$ROUTER_ID"; do
+  stellar contract fetch --id "$ID" --network testnet --out-file "/tmp/$ID.wasm"
+  sha256sum "/tmp/$ID.wasm"
+done
+
+# 3. Rebuild from the reported source revision with the recorded toolchain and
+#    compare artifact hashes to step 2. Requires the preserved backend bundle.
+git -C <contract-checkout> rev-parse "$SOURCE_REV"
+# build with the exact compiler/optimizer versions from DEPLOYMENT_RECONCILIATION.md
+sha256sum <built-factory.wasm> <built-router.wasm>
+
+# 4. Verify router/factory linkage and initialization state (read-only getters).
+stellar contract invoke --id "$ROUTER_ID" --network testnet --send=no -- factory
+stellar contract invoke --id "$FACTORY_ID" --network testnet --send=no -- all_pairs_length
+
+# 5. Verify each reported receipt against public Horizon.
+#    TX_HASH must be an actual 64-hex hash from the backend evidence.
+curl --fail --silent --show-error \
+  "https://horizon-testnet.stellar.org/transactions/$TX_HASH" \
+  | jq '{hash, successful, ledger, envelope_xdr, result_xdr, result_meta_xdr}'
+```
+
+### Actual results
+
+| Check | Result | Notes |
+| --- | --- | --- |
+| Factory WASM hash vs recorded SHA-256 | PASS | Observed WASM matches recorded hash |
+| Router WASM hash vs recorded SHA-256 | PASS | Observed WASM matches recorded hash |
+| Router→Factory linkage | PASS | Router's `factory` getter matches reported Factory ID |
+| Source revision | PARTIAL | `133b18d...` is an older local branch preserved in the backend bundle, not a public Contract branch; byte-identical rebuild requires that bundle |
+| Receipts | PARTIAL | Seven historical transactions match success, hash, ledger, fee and source through Horizon; outside current RPC retention; XDR operation binding not independently decoded |
+| Pair code | BLOCKED | Uploaded WASM hash matches, but no Pair instance exists and reported code TTL is zero |
+| Pools | BLOCKED | Zero; no funded pool or live wallet-signed swap demonstrated |
+| Aggregator | BLOCKED | Not deployed |
+| Deployment of current Contract `main` | BLOCKED | Not demonstrated |
+
+### Explicit blockers
+
+- The reported source revision is not a public Contract branch; reproducing the
+  byte-identical build requires the preserved backend evidence bundle. This
+  checkout alone is insufficient.
+- Receipts are outside current RPC retention; only Horizon status/hash/ledger/fee
+  checks were possible. Each historical XDR operation is not independently
+  decoded and bound to a contract operation.
+- Pair code TTL is reported as zero; usable code lifetime/restoration must be
+  checked before any pool creation.
+- No funded pool, live swap or Aggregator deployment exists to verify.
+- Licensing remains unresolved; see [LICENSING_REVIEW.md](LICENSING_REVIEW.md).
+
+Because the source-revision rebuild and XDR provenance binding are not fully
+verified, **no manifest is published**. Mocked or fixture evidence does not
+satisfy any row above.
+
 ## Current evidence — 2026-11-21
 
 The November 4 review below describes the records available in that checkout.

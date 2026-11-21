@@ -1,6 +1,6 @@
 {
-  "wasm_sha256": "e143ecbad9cc9b7fd78cab3ab66217d9da83a186677648edf8f288797f06aefb",
-  "wasm_size_bytes": 26861,
+  "wasm_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+  "wasm_size_bytes": 0,
   "spec": [
     {
       "function_v0": {

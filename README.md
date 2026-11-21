@@ -83,13 +83,27 @@ submits transactions requires an explicit confirmation, refuses mainnet, and
 reads keys only from the Stellar CLI keystore. See
 [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
+Successful deployment steps are recorded in an atomic, public-only journal
+under `deployments/` (completed IDs, artifact hashes and validated receipt
+identifiers), so a failure part-way through no longer discards provenance. The
+journal contains no signing material, keystore contents or secret environment
+data, and the final manifest is only written after all steps succeed. A
+read-only recovery report lists completed versus missing steps without
+submitting transactions; automatic resumption is not implemented. Journal
+location, schema and the manual recovery procedure are documented in
+[docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+
 An older Testnet deployment from commit `133b18d00505108c26382cb44045abab48b51882`
 has public IDs and receipts preserved in the backend repository. Read-only checks
 on 2026-11-21 matched its Factory, Router and uploaded Pair WASM hashes. Its
 factory has zero pools. This is **not a deployment of current main**; the newer
 constructor and rounding fixes are not present in those immutable contracts.
-See [docs/TESTNET_VERIFICATION.md](docs/TESTNET_VERIFICATION.md) for evidence and
-remaining provenance, licensing, liquidity and wallet-signing limitations.
+Reconciliation of the backend-reported November 2 Factory/Router deployment
+against Testnet (receipts, WASM hashes and source revision) is tracked in
+[docs/TESTNET_VERIFICATION.md](docs/TESTNET_VERIFICATION.md); no manifest is
+published from that evidence unless verification succeeds, and mocked evidence
+is never treated as success. See that document for evidence and remaining
+provenance, licensing, liquidity and wallet-signing limitations.
 
 ## Documentation
 

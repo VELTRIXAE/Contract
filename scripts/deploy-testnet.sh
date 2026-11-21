@@ -24,6 +24,7 @@ NETWORK="testnet"
 SOURCE=""
 FEE_SETTER=""
 AUTHORIZED=0
+RECOVER=0
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -31,21 +32,32 @@ while [[ $# -gt 0 ]]; do
     --source) SOURCE="$2"; shift 2 ;;
     --fee-setter) FEE_SETTER="$2"; shift 2 ;;
     --i-authorize-testnet-deploy) AUTHORIZED=1; shift ;;
+    --recover|--dry-run) RECOVER=1; shift ;;
     -h|--help) sed -n '2,25p' "$0"; exit 0 ;;
     *) die "Unknown argument: $1" ;;
   esac
 done
 
-[[ -n "$SOURCE" ]] || die "--source <identity> is required (a name from 'stellar keys ls')."
 require_public_testnet "$NETWORK"
-require_stellar
 require_jq
+
+# Recovery view: report journal state only. Never submits transactions and
+# never requires an identity or signing material.
+if [[ $RECOVER -eq 1 ]]; then
+  journal_report "$NETWORK"
+  exit 0
+fi
+
+[[ -n "$SOURCE" ]] || die "--source <identity> is required (a name from 'stellar keys ls')."
+require_stellar
 check_identity "$SOURCE"
 
 SOURCE_ADDR="$("$STELLAR" keys address "$SOURCE")"
 FEE_SETTER="${FEE_SETTER:-$SOURCE_ADDR}"
 OUT="$(deployment_file "$NETWORK")"
 [[ ! -e "$OUT" ]] || die "Existing record $OUT: verify or remediate it; refusing redeployment."
+JOURNAL="$(journal_file "$NETWORK")"
+journal_init "$NETWORK"
 LOG_DIR="$(mktemp -d)"
 trap 'rm -rf "$LOG_DIR"' EXIT
 
@@ -57,6 +69,7 @@ cat >&2 <<MSG
   source       : $SOURCE ($SOURCE_ADDR)
   fee setter   : $FEE_SETTER
   output       : $OUT
+  journal      : $JOURNAL
 
   This will submit real transactions to $NETWORK.
 MSG
@@ -89,32 +102,54 @@ run() { # run <logname> <stellar args...>  -> stdout of the command; log kept fo
 
 log "Uploading pair WASM"
 PAIR_HASH="$(run upload_pair contract upload --wasm "$PAIR_WASM" | tail -n1)"
-PAIR_UPLOAD_TX="$(extract_tx_hash "$LOG_DIR/upload_pair.log")"
 [[ "$PAIR_HASH" =~ ^[0-9a-f]{64}$ ]] || die "Unexpected pair WASM hash: $PAIR_HASH"
+PAIR_UPLOAD_TX="$(validate_receipt "$LOG_DIR/upload_pair.log" upload "$PAIR_HASH")"
+journal_append "$NETWORK" "pair_upload" \
+  --arg wasm_hash "$PAIR_HASH" \
+  --arg wasm_sha256 "$(sha256_file "$PAIR_WASM")" \
+  --arg tx "$PAIR_UPLOAD_TX"
 
 log "Deploying factory"
 FACTORY_ID="$(run deploy_factory contract deploy --wasm "$FACTORY_WASM" -- --setter "$FEE_SETTER" --pair_wasm_hash "$PAIR_HASH" | tail -n1)"
-FACTORY_DEPLOY_TX="$(extract_tx_hash "$LOG_DIR/deploy_factory.log")"
+[[ "$FACTORY_ID" =~ ^C[A-Z2-7]{55}$ ]] || die "Unexpected factory contract ID: $FACTORY_ID"
+FACTORY_DEPLOY_TX="$(validate_receipt "$LOG_DIR/deploy_factory.log" deploy "$FACTORY_ID")"
 
 # Constructor initialization and deployment have the same actual receipt.
 FACTORY_INIT_TX="$FACTORY_DEPLOY_TX"
 
+journal_append "$NETWORK" "factory_deploy" \
+  --arg contract_id "$FACTORY_ID" \
+  --arg wasm_sha256 "$(sha256_file "$FACTORY_WASM")" \
+  --arg tx "$FACTORY_DEPLOY_TX"
+
 ACTUAL_SETTER="$(run verify_factory contract invoke --send=no --id "$FACTORY_ID" -- fee_to_setter | tr -d '"')"
 [[ "$ACTUAL_SETTER" == "$FEE_SETTER" ]] \
   || die "Factory fee_to_setter is '$ACTUAL_SETTER', expected '$FEE_SETTER'. Refusing to proceed; investigate code, arguments and receipt."
+journal_append "$NETWORK" "factory_verify" \
+  --arg contract_id "$FACTORY_ID" \
+  --arg fee_to_setter "$ACTUAL_SETTER"
 
 log "Deploying router"
 ROUTER_ID="$(run deploy_router contract deploy --wasm "$ROUTER_WASM" -- --factory "$FACTORY_ID" | tail -n1)"
-ROUTER_DEPLOY_TX="$(extract_tx_hash "$LOG_DIR/deploy_router.log")"
+[[ "$ROUTER_ID" =~ ^C[A-Z2-7]{55}$ ]] || die "Unexpected router contract ID: $ROUTER_ID"
+ROUTER_DEPLOY_TX="$(validate_receipt "$LOG_DIR/deploy_router.log" deploy "$ROUTER_ID")"
 
 ROUTER_INIT_TX="$ROUTER_DEPLOY_TX"
+
+journal_append "$NETWORK" "router_deploy" \
+  --arg contract_id "$ROUTER_ID" \
+  --arg wasm_sha256 "$(sha256_file "$ROUTER_WASM")" \
+  --arg tx "$ROUTER_DEPLOY_TX"
 
 ACTUAL_FACTORY="$(run verify_router contract invoke --send=no --id "$ROUTER_ID" -- get_factory | tr -d '"')"
 [[ "$ACTUAL_FACTORY" == "$FACTORY_ID" ]] \
   || die "Router factory is '$ACTUAL_FACTORY', expected '$FACTORY_ID'. Refusing to proceed; investigate code, arguments and receipt."
+journal_append "$NETWORK" "router_verify" \
+  --arg contract_id "$ROUTER_ID" \
+  --arg factory "$ACTUAL_FACTORY"
 
 mkdir -p "$DEPLOYMENTS_DIR"
-sha() { sha256sum "$1" | cut -d' ' -f1; }
+[[ ! -e "$OUT" ]] || die "Existing record $OUT appeared during deployment; refusing to overwrite."
 jq -n \
   --arg network "$NETWORK" \
   --arg deployed_at "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
@@ -123,7 +158,7 @@ jq -n \
   --arg commit "$(git -C "$ROOT_DIR" rev-parse HEAD 2>/dev/null || echo unknown)" \
   --arg factory "$FACTORY_ID" --arg router "$ROUTER_ID" \
   --arg pair_hash "$PAIR_HASH" \
-  --arg factory_wasm "$(sha "$FACTORY_WASM")" --arg router_wasm "$(sha "$ROUTER_WASM")" \
+  --arg factory_wasm "$(sha256_file "$FACTORY_WASM")" --arg router_wasm "$(sha256_file "$ROUTER_WASM")" \
   --arg pair_upload_tx "$PAIR_UPLOAD_TX" \
   --arg factory_deploy_tx "$FACTORY_DEPLOY_TX" --arg factory_init_tx "$FACTORY_INIT_TX" \
   --arg router_deploy_tx "$ROUTER_DEPLOY_TX" --arg router_init_tx "$ROUTER_INIT_TX" \
@@ -139,8 +174,13 @@ jq -n \
       pair:    { wasm_hash: $pair_hash, upload_tx: $pair_upload_tx }
     },
     pools: []
-  }' > "$OUT"
+  }' > "$OUT.tmp.$$"
+mv -n "$OUT.tmp.$$" "$OUT"
+[[ -e "$OUT.tmp.$$" ]] && { rm -f "$OUT.tmp.$$"; die "Refusing to overwrite existing $OUT."; }
+
+journal_append "$NETWORK" "manifest_written" --arg path "$OUT"
 
 log "Deployment recorded in $OUT"
 cat "$OUT"
+log "Journal: $JOURNAL"
 log "Next: ./scripts/verify-deployment.sh --network $NETWORK"

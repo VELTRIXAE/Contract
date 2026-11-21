@@ -102,11 +102,123 @@ Read-only (simulation only, submits nothing). Checks:
 - Commit `deployments/testnet.json` together with the git commit it was
   built from (recorded in the file as `git_commit`).
 
+## Durable deployment journal
+
+`scripts/deploy-testnet.sh` keeps a public-only journal of every successful
+step so a failure after upload or deployment does not lose provenance. The
+journal lives at:
+
+```
+deployments/testnet.journal.json
+```
+
+It is written **atomically** (temp file + `fsync` + rename) after each
+successful step, so a crash leaves either the previous or the new complete
+record, never a partial one. The journal is append-only in effect: existing
+records are never rewritten, and the final `deployments/testnet.json` is
+refused if it already exists (the script will not overwrite a manifest).
+
+### Schema
+
+```json
+{
+  "schema": "veltrixae-deployment-journal-v1",
+  "network": "testnet",
+  "network_passphrase": "Test SDF Network ; September 2015",
+  "git_commit": "<sha of the tree the WASM was built from>",
+  "created_at": "<RFC3339 UTC>",
+  "steps": [
+    {
+      "step": "upload-pair-wasm",
+      "status": "succeeded",
+      "artifact_sha256": "<sha256 of the optimized pair WASM>",
+      "wasm_hash": "<on-chain WASM hash returned by the CLI>",
+      "receipt": {
+        "operation": "upload",
+        "contract_id": null,
+        "wasm_hash": "<same as wasm_hash>",
+        "tx_hash": "<transaction hash>",
+        "ledger": 123456
+      },
+      "recorded_at": "<RFC3339 UTC>"
+    }
+  ]
+}
+```
+
+Only public data is recorded: contract IDs, WASM hashes, artifact sha256
+digests, transaction hashes, ledger numbers and timestamps. The journal
+**never** contains secret keys, CLI keystore contents, signed envelopes or
+secret environment variables. Do not add them.
+
+### Structured receipt validation
+
+Receipts are validated structurally, not by scraping the last hexadecimal
+string from CLI output. A receipt is accepted only if:
+
+- its `operation` matches the step (`upload`, `deploy`, `invoke`);
+- for `deploy`/`invoke`, the `contract_id` equals the ID the step was
+  expected to produce (mismatched contract identity is rejected);
+- for `upload`, the `wasm_hash` equals the hash the CLI reported for that
+  upload (mismatched code identity is rejected);
+- the `tx_hash` is a well-formed 64-hex-character transaction hash.
+
+Unrelated operations or mismatched contract/code identities fail the step
+loudly. A malformed or stale journal (wrong `schema`, wrong `network`,
+unparseable JSON) aborts the script with a clear error rather than being
+silently ignored or overwritten.
+
+### Dry-run recovery view
+
+To see which steps completed and which are missing, without submitting any
+transaction:
+
+```bash
+./scripts/deploy-testnet.sh --recover --network testnet
+```
+
+This is read-only: it parses the journal, prints a report of completed versus
+missing steps (with artifact hashes and receipt identifiers), and exits. It
+does not upload, deploy, invoke or resume anything. Automatic transaction
+resumption is out of scope; resuming requires a separately reviewed change.
+
+### Manual recovery procedure
+
+1. Run the dry-run recovery view above and note the completed steps.
+2. Compare the journal's `git_commit` and artifact hashes with the tree you
+   intend to deploy. If they differ, stop: the journal is stale for this
+   build.
+3. For a missing step, re-run the deployment manually with human approval.
+   The script refuses to overwrite an existing `deployments/testnet.json`; if
+   a manifest already exists, treat it as authoritative and verify it with
+   `./scripts/verify-deployment.sh --network testnet`.
+4. Record the outcome in the pull request. Never hand-edit the journal or the
+   manifest to make them agree.
+
 ## After a deployment: record keeping
 
 Only values returned by the network belong in `deployments/*.json`. Do not
 hand-edit IDs or hashes. If a deployment is abandoned (e.g. state mismatch), note it in the pull request but do not record the abandoned IDs as
 live.
+
+## Reconciling backend-reported deployments
+
+The backend may report a deployment (for example a November 2 Factory/Router
+deployment) that the contract repository has no manifest for. Reconciling it
+is a separate, read-only task from the durable journal above:
+
+1. Fetch the reported contract IDs and transaction hashes from the backend
+   records.
+2. Query Testnet for each ID (`stellar contract info`, ledger/transaction
+   lookups) and confirm the operations exist and match the reported IDs.
+3. Match the on-chain WASM hash against a locally rebuilt artifact and record
+   the source revision it corresponds to.
+4. Publish a manifest **only** if every check passes. Otherwise record the
+   mismatch as a blocker.
+
+Mocked or simulated evidence is not success. Do not claim a deployment is
+verified on the basis of offline mocks, log scraping or backend assertions
+alone; only network-returned values count.
 
 ## Mainnet
 

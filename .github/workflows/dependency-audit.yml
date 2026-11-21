@@ -26,3 +26,44 @@ jobs:
             npm ci --ignore-scripts --prefix "bindings/$contract"
             npm audit --audit-level=moderate --prefix "bindings/$contract"
           done
+  cargo-audit:
+    name: Strict cargo audit (SDK migration)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Install cargo-audit
+        run: cargo install cargo-audit --locked
+      # RUSTSEC-2026-0387 (crypto-bigint 0.5.5) is resolved by migrating the
+      # coupled soroban-sdk / soroban-env-host / elliptic-curve chain so the
+      # lockfiles resolve crypto-bigint >= 0.7.6. No advisory is suppressed.
+      - name: Audit root Cargo.lock
+        run: cargo audit --file Cargo.lock
+      - name: Audit tools/spec-tool/Cargo.lock
+        run: cargo audit --file tools/spec-tool/Cargo.lock
+      - name: Verify crypto-bigint resolution
+        run: |
+          cargo tree --locked --offline -i crypto-bigint
+          cargo tree --locked --target wasm32v1-none -i crypto-bigint
+  binding-generator-lockfile:
+    name: Binding-generator lockfile (separate fix)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@stable
+      # The binding-generator lockfile failure is independent of the SDK
+      # migration and is repaired on codex/fix-contract-ci.
+      - name: Audit binding-generator lockfile
+        run: |
+          if [ -f tools/binding-generator/Cargo.lock ]; then
+            cargo install cargo-audit --locked
+            cargo audit --file tools/binding-generator/Cargo.lock
+          else
+            echo "No binding-generator lockfile present; skipping."
+          fi

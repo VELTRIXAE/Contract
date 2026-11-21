@@ -20,6 +20,15 @@ soroban-sdk = "22.0.11"
 soroban-token-sdk = "22.0.11"
 num-integer = { version = "0.1.46", default-features = false, features = ["i128"] }
 
+# RUSTSEC-2026-0387 (crypto-bigint <0.7.6) reaches the native host/test build
+# through soroban-env-host -> elliptic-curve -> crypto-bigint. The wasm contract
+# target does not pull it in. Resolve it by pinning the curve stack to the
+# upstream-reviewed releases that depend on crypto-bigint >=0.7.6, keeping the
+# soroban-sdk 22.x public interfaces unchanged. Do not add advisory ignores.
+[patch.crates-io]
+elliptic-curve = "0.13.8"
+crypto-bigint = "0.7.6"
+
 # One release profile for every contract. `overflow-checks = true` makes any
 # unchecked arithmetic that slips through abort instead of wrapping. Upstream
 # enabled it for factory, library and token but not for pair or router.

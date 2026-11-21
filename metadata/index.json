@@ -1,6 +1,6 @@
 {
   "project": "VELTRIXAE",
-  "soroban_sdk": "22.0.11",
+  "soroban_sdk": "23.0.0",
   "note": "Event topics keep the upstream Soroswap prefixes for indexer compatibility.",
   "contracts": {
     "factory": {

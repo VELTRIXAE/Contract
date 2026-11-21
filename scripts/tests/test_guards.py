@@ -67,6 +67,7 @@ else:
         self.env = dict(os.environ, STELLAR=str(cli), CALLS=str(self.calls))
         self.env['PATH'] = str(self.root) + os.pathsep + os.environ['PATH']
         self.manifest = self.root / 'deployments/testnet.json'
+        self.journal = self.root / 'deployments/testnet.journal.json'
         digest = hashlib.sha256(b'code').hexdigest()
         self.manifest.write_text(json.dumps({
             'network': 'testnet', 'fee_to_setter': 'GSETTER',
@@ -198,6 +199,173 @@ else:
         result = self.run_script('remediate-testnet.sh')
         self.assertNotEqual(result.returncode, 0)
         self.assertFalse(self.calls.exists())
+
+    # --- Durable deployment journal (issue #13) ---------------------------
+
+    def prepare_deploy(self):
+        self.manifest.unlink()
+        (self.root / 'scripts/build.sh').write_text('#!/usr/bin/env bash\nexit 0\n')
+        wasm = self.root / 'target/wasm32v1-none/release'
+        wasm.mkdir(parents=True)
+        for contract in ['factory', 'pair', 'router']:
+            (wasm / f'veltrixae_{contract}.wasm').write_bytes(b'code')
+
+    def deploy(self):
+        return self.run_script('deploy-testnet.sh', '--source', 'mock-identity',
+                               '--i-authorize-testnet-deploy')
+
+    def journal_record(self):
+        self.assertTrue(self.journal.exists(), 'journal was not written')
+        return json.loads(self.journal.read_text())
+
+    def assert_journal_public_only(self):
+        text = self.journal.read_text()
+        for secret in ['mock-identity', 'SECRET', 'secret_key', 'seed', 'keystore']:
+            self.assertNotIn(secret, text)
+
+    def test_journal_preserved_after_upload_interrupt(self):
+        self.prepare_deploy()
+        self.env['INTERRUPT_AFTER'] = 'upload:pair'
+        result = self.deploy()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse(self.manifest.exists())
+        record = self.journal_record()
+        self.assertEqual(record['network'], 'testnet')
+        self.assertEqual(record['status'], 'incomplete')
+        pair = record['steps']['upload:pair']
+        self.assertEqual(pair['wasm_sha256'], hashlib.sha256(b'code').hexdigest())
+        self.assertEqual(pair['receipt']['tx_hash'], '1' * 64)
+        self.assert_journal_public_only()
+
+    def test_journal_preserved_after_factory_deploy_interrupt(self):
+        self.prepare_deploy()
+        self.env['INTERRUPT_AFTER'] = 'deploy:factory'
+        result = self.deploy()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse(self.manifest.exists())
+        record = self.journal_record()
+        factory = record['steps']['deploy:factory']
+        self.assertEqual(factory['contract_id'], 'CFACTORY')
+        self.assertEqual(factory['receipt']['tx_hash'], '2' * 64)
+        self.assertEqual(factory['receipt']['operation'], 'deploy')
+        self.assert_journal_public_only()
+
+    def test_journal_preserved_after_router_deploy_interrupt(self):
+        self.prepare_deploy()
+        self.env['INTERRUPT_AFTER'] = 'deploy:router'
+        result = self.deploy()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse(self.manifest.exists())
+        record = self.journal_record()
+        self.assertIn('deploy:factory', record['steps'])
+        router = record['steps']['deploy:router']
+        self.assertEqual(router['contract_id'], 'CROUTER')
+        self.assertEqual(router['receipt']['tx_hash'], '2' * 64)
+        self.assert_journal_public_only()
+
+    def test_journal_writes_are_atomic(self):
+        self.prepare_deploy()
+        self.env['INTERRUPT_AFTER'] = 'upload:pair'
+        self.deploy()
+        leftovers = [p.name for p in self.journal.parent.iterdir()
+                     if p.name.startswith('testnet.journal.json.')]
+        self.assertEqual(leftovers, [])
+
+    def test_malformed_journal_fails_clearly(self):
+        self.prepare_deploy()
+        self.journal.write_text('{not json')
+        result = self.deploy()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('journal', result.stderr.lower())
+        self.assertFalse(self.manifest.exists())
+
+    def test_stale_journal_network_fails_clearly(self):
+        self.prepare_deploy()
+        self.journal.write_text(json.dumps({'network': 'mainnet', 'steps': {}}))
+        result = self.deploy()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('journal', result.stderr.lower())
+        self.assertFalse(self.manifest.exists())
+
+    def test_journal_never_overwrites_existing_manifest(self):
+        self.prepare_deploy()
+        self.env['INTERRUPT_AFTER'] = 'upload:pair'
+        self.deploy()
+        self.manifest.write_text('{"sentinel": true}')
+        result = self.deploy()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('refusing redeployment', result.stderr)
+        self.assertEqual(self.manifest.read_text(), '{"sentinel": true}')
+
+    def test_journal_rejects_unrelated_receipt_operation(self):
+        self.prepare_deploy()
+        self.env['RECEIPT_OPERATION'] = 'invoke'
+        self.env['INTERRUPT_AFTER'] = 'upload:pair'
+        result = self.deploy()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('receipt', result.stderr.lower())
+        self.assertFalse(self.manifest.exists())
+
+    def test_journal_rejects_mismatched_contract_identity(self):
+        self.prepare_deploy()
+        self.env['RECEIPT_CONTRACT'] = 'CWRONG'
+        self.env['INTERRUPT_AFTER'] = 'deploy:factory'
+        result = self.deploy()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('receipt', result.stderr.lower())
+        self.assertFalse(self.manifest.exists())
+
+    def test_journal_rejects_mismatched_code_identity(self):
+        self.prepare_deploy()
+        self.env['RECEIPT_WASM'] = 'f' * 64
+        self.env['INTERRUPT_AFTER'] = 'upload:pair'
+        result = self.deploy()
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('receipt', result.stderr.lower())
+        self.assertFalse(self.manifest.exists())
+
+    def test_recovery_report_lists_completed_and_missing(self):
+        self.prepare_deploy()
+        self.env['INTERRUPT_AFTER'] = 'deploy:factory'
+        self.deploy()
+        result = self.run_script('recover-testnet.sh')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('deploy:factory', result.stdout)
+        self.assertIn('deploy:router', result.stdout)
+        self.assertIn('missing', result.stdout.lower())
+        self.assert_no_submission()
+
+    def test_recovery_report_missing_journal_fails(self):
+        result = self.run_script('recover-testnet.sh')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertFalse(self.calls.exists())
+
+    def test_recovery_report_malformed_journal_fails(self):
+        self.journal.write_text('{not json')
+        result = self.run_script('recover-testnet.sh')
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn('journal', result.stderr.lower())
+        self.assertFalse(self.calls.exists())
+
+    def test_verifier_reconciles_journal_receipts(self):
+        self.prepare_deploy()
+        self.env['INTERRUPT_AFTER'] = 'deploy:factory'
+        self.deploy()
+        result = self.run_script('verify-deployment.sh', '--journal')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn('deploy:factory', result.stdout)
+        self.assert_no_submission()
+
+    def test_verifier_rejects_journal_receipt_mismatch(self):
+        self.prepare_deploy()
+        self.env['INTERRUPT_AFTER'] = 'deploy:factory'
+        self.deploy()
+        record = self.journal_record()
+        record['steps']['deploy:factory']['contract_id'] = 'CWRONG'
+        self.journal.write_text(json.dumps(record))
+        result = self.run_script('verify-deployment.sh', '--journal')
+        self.assertNotEqual(result.returncode, 0)
+        self.assert_no_submission()
 
 
 if __name__ == '__main__':
